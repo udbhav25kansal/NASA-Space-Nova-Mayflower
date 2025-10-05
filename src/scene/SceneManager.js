@@ -314,34 +314,45 @@ export default class SceneManager {
    * Inspired by real Moon surface photos - multiple crater sizes and details
    */
   addLunarSurface() {
-    // Create detailed ground mesh
-    const groundSize = 60;
-    const groundGeometry = new THREE.PlaneGeometry(groundSize, groundSize, 128, 128);
+    // Create LARGE ground mesh that extends far in all directions
+    const groundSize = 200; // Much larger to prevent seeing edges
+    const groundGeometry = new THREE.PlaneGeometry(groundSize, groundSize, 256, 256);
 
     // Create realistic crater field
     const positions = groundGeometry.attributes.position;
     const colors = new Float32Array(positions.count * 3);
 
-    // Define multiple craters with varying sizes and depths
+    // Generate many craters across the large surface
     const craters = [
-      // Large craters
+      // Large craters (visible from far away)
       { x: 12, z: 15, radius: 8, depth: 1.2 },
       { x: -15, z: -10, radius: 10, depth: 1.5 },
       { x: 20, z: -18, radius: 6, depth: 0.9 },
+      { x: -45, z: 40, radius: 12, depth: 1.8 },
+      { x: 60, z: -50, radius: 9, depth: 1.3 },
+      { x: -70, z: -60, radius: 11, depth: 1.6 },
 
       // Medium craters
       { x: -8, z: 12, radius: 4, depth: 0.6 },
       { x: 5, z: -5, radius: 3.5, depth: 0.5 },
       { x: -20, z: 8, radius: 5, depth: 0.7 },
       { x: 15, z: 8, radius: 3, depth: 0.4 },
+      { x: 35, z: 40, radius: 4.5, depth: 0.65 },
+      { x: -50, z: 25, radius: 5.5, depth: 0.75 },
+      { x: 55, z: 30, radius: 4, depth: 0.55 },
+      { x: -40, z: -35, radius: 3.8, depth: 0.58 },
 
-      // Small craters
+      // Small craters (scattered)
       { x: 0, z: 20, radius: 2, depth: 0.3 },
       { x: -5, z: -20, radius: 1.8, depth: 0.25 },
       { x: 8, z: -12, radius: 2.2, depth: 0.35 },
       { x: -12, z: 18, radius: 1.5, depth: 0.2 },
       { x: 18, z: 5, radius: 1.6, depth: 0.22 },
       { x: -18, z: -5, radius: 1.4, depth: 0.18 },
+      { x: 30, z: -30, radius: 2.1, depth: 0.28 },
+      { x: -35, z: 50, radius: 1.7, depth: 0.24 },
+      { x: 65, z: 65, radius: 2.3, depth: 0.32 },
+      { x: -65, z: -70, radius: 1.9, depth: 0.27 },
     ];
 
     // Apply crater deformations and color variations
@@ -388,8 +399,8 @@ export default class SceneManager {
       // Set vertex height
       positions.setZ(i, height);
 
-      // Set vertex color based on brightness
-      const baseColor = { r: 0.54, g: 0.53, b: 0.50 }; // Lunar gray
+      // Set vertex color based on brightness (lighter lunar gray with sunlight)
+      const baseColor = { r: 0.75, g: 0.73, b: 0.70 }; // Lighter lunar gray (sunlit)
       colors[i * 3] = baseColor.r * brightness;
       colors[i * 3 + 1] = baseColor.g * brightness;
       colors[i * 3 + 2] = baseColor.b * brightness;
@@ -414,14 +425,14 @@ export default class SceneManager {
     ground.castShadow = false;
     this.scene.add(ground);
 
-    // Add very subtle grid for reference
-    const gridHelper = new THREE.GridHelper(20, 40, 0x404040, 0x202020);
+    // Add larger subtle grid for reference (matches large surface)
+    const gridHelper = new THREE.GridHelper(100, 100, 0x505050, 0x303030);
     gridHelper.position.y = 0;
     gridHelper.material.transparent = true;
-    gridHelper.material.opacity = 0.15;
+    gridHelper.material.opacity = 0.12;
     this.scene.add(gridHelper);
 
-    console.log('🌙 Lunar surface created with', craters.length, 'craters');
+    console.log('🌙 Lunar surface created: 200m x 200m with', craters.length, 'craters');
   }
 
   /**
