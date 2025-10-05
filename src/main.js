@@ -244,11 +244,11 @@ class HabitatHarmonyApp {
     // Initialize HUD
     this.hud = new HUD(this.validator);
 
-    // Habitat Configurator temporarily disabled
-    // this.habitatConfigurator = new HabitatConfigurator((config) => {
-    //   this.updateHabitatConfiguration(config);
-    // });
-    // this.habitatConfigurator.render();
+    // Habitat Configurator - Re-enabled with fix
+    this.habitatConfigurator = new HabitatConfigurator((config) => {
+      this.updateHabitatConfiguration(config);
+    });
+    this.habitatConfigurator.render();
 
     // Initialize Catalog
     this.catalog = new Catalog(ModuleCatalog, (catalogItem) => {
@@ -264,9 +264,16 @@ class HabitatHarmonyApp {
       this.validator
     );
 
-    // Advanced features temporarily disabled for stability
-    // this.objectCatalog = new ObjectCatalog((objectDef) => { this.addObject(objectDef); });
-    // this.scenarioLoader = new ScenarioLoader(...);
+    // Object Catalog - Re-enabled
+    this.objectCatalog = new ObjectCatalog((objectDef) => {
+      this.addObject(objectDef);
+    });
+
+    // Scenario Loader - Re-enabled
+    this.scenarioLoader = new ScenarioLoader((scenario) => {
+      this.loadMissionScenario(scenario);
+    });
+    this.scenarioLoader.render();
 
     // Setup tile visualization toggle button
     this.setupTileVisualizationToggle();
@@ -561,6 +568,13 @@ class HabitatHarmonyApp {
 
       // Add to objects array
       this.objects.push(mesh);
+
+      // Make object draggable by adding to drag controls
+      if (this.dragControls) {
+        // Note: DragControls currently only works with modules
+        // Objects will need separate drag handling or DragControls extension
+        // For now, objects are placed but not draggable
+      }
 
       Toast.success(`Added ${objectDef.name} (${objectDef.mass_kg} kg)`);
       console.log(`➕ Added object: ${objectDef.name} (ID: ${id})`);
@@ -1422,7 +1436,7 @@ class HabitatHarmonyApp {
 
       if (csv) {
         const timestamp = new Date().toISOString().split('T')[0];
-        const filename = `habitat-harmony-mars-sim-${timestamp}.csv`;
+        const filename = `lunar-crew-psych-report-${timestamp}.csv`;
         CSVGenerator.downloadCSV(csv, filename);
 
         console.log(`✅ CSV exported successfully: ${filename}`);
