@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Habitat Harmony: NASA-data-driven lunar habitat layout simulator for evaluating psychological resilience">
+  <meta name="keywords" content="NASA, Space Apps, Habitat Design, Three.js, Lunar Simulator">
+  <meta name="author" content="Habitat Harmony Team">
+  <title>LS² Layout Builder — NASA Habitability Rules</title>
+  <style>
+    /* Reset & Base Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: #ffffff;
+      overflow: hidden;
+    }
+
+    /* Main App Layout */
+    #app {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      grid-template-rows: 48px 1fr;
+      height: 100%;
+      width: 100%;
+    }
+
+    /* Header */
+    header {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px;
+      background: #ffffff;
+      border-bottom: 2px solid #e5e7eb;
+      z-index: 10;
+    }
+
+    header h1 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #111827;
+      margin: 0;
+    }
+
+    .header-info {
+      display: flex;
+      gap: 16px;
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    /* Left Sidebar */
+    #left {
+      border-right: 2px solid #e5e7eb;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 12px;
+      background: #fafafa;
+    }
+
+    /* HUD */
+    #hud {
+      padding: 12px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+
+    #hud .row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin: 6px 0;
+      color: #374151;
+    }
+
+    #hud strong {
+      color: #111827;
+      font-weight: 600;
+    }
+
+    /* Legend */
+    .legend {
+      margin-bottom: 16px;
+    }
+
+    .legend h3 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #111827;
+    }
+
+    .legend .item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      margin: 6px 0;
+      color: #4b5563;
+    }
+
+    .swatch {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      border: 1px solid #d1d5db;
+      flex-shrink: 0;
+    }
+
+    /* Tools Section */
+    #tools {
+      margin-bottom: 16px;
+    }
+
+    #tools h3 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #111827;
+    }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      background: #111827;
+      color: white;
+      border: none;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-bottom: 8px;
+    }
+
+    .btn:hover:not(:disabled) {
+      background: #1f2937;
+    }
+
+    .btn:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .btn.secondary {
+      background: #374151;
+    }
+
+    .btn.secondary:hover:not(:disabled) {
+      background: #4b5563;
+    }
+
+    .btn.outline {
+      background: white;
+      color: #111827;
+      border: 1px solid #d1d5db;
+    }
+
+    .btn.outline:hover {
+      background: #f3f4f6;
+    }
+
+    /* Module Catalog */
+    #catalogSection {
+      margin-bottom: 16px;
+    }
+
+    #catalogSection h3 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #111827;
+    }
+
+    #catalog {
+      display: grid;
+      gap: 8px;
+    }
+
+    .tile {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #e5e7eb;
+      padding: 10px;
+      border-radius: 6px;
+      cursor: grab;
+      background: white;
+      transition: box-shadow 0.2s, border-color 0.2s;
+    }
+
+    .tile:hover {
+      border-color: #9ca3af;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .tile .info {
+      flex: 1;
+    }
+
+    .tile strong {
+      display: block;
+      font-size: 13px;
+      color: #111827;
+      margin-bottom: 2px;
+    }
+
+    .tile small {
+      display: block;
+      font-size: 11px;
+      color: #6b7280;
+    }
+
+    .zone-badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      margin-top: 4px;
+      text-transform: uppercase;
+    }
+
+    .zone-badge.clean {
+      background: #bae6fd;
+      color: #0369a1;
+    }
+
+    .zone-badge.dirty {
+      background: #fecaca;
+      color: #b91c1c;
+    }
+
+    .tile button {
+      padding: 6px 12px;
+      font-size: 12px;
+      margin: 0;
+      width: auto;
+    }
+
+    /* Errors */
+    #errors {
+      margin-top: 16px;
+      font-size: 12px;
+      color: #b91c1c;
+    }
+
+    #errors .error-item {
+      padding: 8px;
+      background: #fee2e2;
+      border-left: 3px solid #b91c1c;
+      border-radius: 4px;
+      margin-bottom: 6px;
+    }
+
+    /* Right Main Area */
+    #right {
+      position: relative;
+      background: #ffffff;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Toast Notifications */
+    #toast {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: #111827;
+      color: white;
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: opacity 0.3s, transform 0.3s;
+      display: none;
+      z-index: 1000;
+      max-width: 300px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    }
+
+    #toast.show {
+      display: block;
+      opacity: 0.95;
+      transform: translateY(0);
+    }
+
+    #toast.toast-success {
+      background: #059669;
+    }
+
+    #toast.toast-error {
+      background: #dc2626;
+    }
+
+    #toast.toast-warning {
+      background: #d97706;
+    }
+
+    #toast.toast-info {
+      background: #2563eb;
+    }
+
+    /* Instructions */
+    #instructions {
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.95);
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      color: #4b5563;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    /* Loading State */
+    #loading {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.95);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: #6b7280;
+      z-index: 9999;
+    }
+
+    #loading.hidden {
+      display: none;
+    }
+
+    /* Scrollbar Styling */
+    #left::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    #left::-webkit-scrollbar-track {
+      background: #f3f4f6;
+    }
+
+    #left::-webkit-scrollbar-thumb {
+      background: #d1d5db;
+      border-radius: 4px;
+    }
+
+    #left::-webkit-scrollbar-thumb:hover {
+      background: #9ca3af;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      #app {
+        grid-template-columns: 1fr;
+        grid-template-rows: 48px auto 1fr;
+      }
+
+      #left {
+        max-height: 300px;
+        border-right: none;
+        border-bottom: 2px solid #e5e7eb;
+      }
+
+      header h1 {
+        font-size: 14px;
+      }
+
+      .header-info {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="loading">
+    <div>Loading Habitat Harmony LS²...</div>
+  </div>
+
+  <div id="app">
+    <header>
+      <h1>LS² Layout Builder — NASA Habitability Rules</h1>
+      <div class="header-info">
+        <span>Units: meters (SI)</span>
+        <span>Sources: NASA TP-2020-220505, AIAA 2022</span>
+      </div>
+    </header>
+
+    <aside id="left">
+      <!-- HUD Metrics -->
+      <div id="hud">
+        <div class="row">
+          <span>Total Footprint:</span>
+          <strong><span id="areaTotal">0.00</span> m²</strong>
+        </div>
+        <div class="row">
+          <span>Module Count:</span>
+          <strong id="moduleCount">0</strong>
+        </div>
+        <div class="row">
+          <span>Adjacency Compliance:</span>
+          <strong id="adjComp">100%</strong>
+        </div>
+        <div class="row">
+          <span>Path Width ≥1.0m:</span>
+          <strong id="pathOk">OK</strong>
+        </div>
+      </div>
+
+      <!-- Zone Legend -->
+      <div class="legend">
+        <h3>Zone Legend</h3>
+        <div class="item">
+          <span class="swatch" style="background:#bae6fd;"></span>
+          <span>Clean zone (Crew, Galley, Work)</span>
+        </div>
+        <div class="item">
+          <span class="swatch" style="background:#fecaca;"></span>
+          <span>Dirty zone (WCS, Hygiene, Exercise)</span>
+        </div>
+        <div class="item">
+          <span class="swatch" style="background:#fde68a;"></span>
+          <span>Violation flagged</span>
+        </div>
+      </div>
+
+      <!-- Module Controls -->
+      <div id="tools">
+        <h3>Module Controls</h3>
+        <button class="btn" id="rotateBtn" disabled>Rotate (R)</button>
+        <button class="btn" id="deleteBtn" disabled>Delete (Del)</button>
+        <button class="btn outline" id="exportBtn">Export JSON</button>
+        <label class="btn outline">
+          Import JSON
+          <input id="importFile" type="file" accept=".json" style="display:none" />
+        </label>
+      </div>
+
+      <!-- Module Catalog -->
+      <div id="catalogSection">
+        <h3>Module Catalog</h3>
+        <div id="catalog"></div>
+      </div>
+
+      <!-- Errors -->
+      <div id="errors"></div>
+    </aside>
+
+    <main id="right">
+      <div id="toast"></div>
+      <canvas id="c"></canvas>
+      <div id="instructions">
+        <p>Click a module to select • Drag to move • R to rotate • Del to delete</p>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,523 @@
+{
+  "unit_system": "SI",
+  "notes": "All areas in m², volumes in m³; widths/heights in meters. Values come directly from NASA TP-2020-220505 and the AIAA ASCEND 2022 'Internal Layout of a Lunar Surface Habitat' paper.",
+  "sources": [
+    {
+      "id": "NASA-TP-2020-220505",
+      "title": "Deep Space Habitability Design Guidelines",
+      "url": "https://ntrs.nasa.gov/"
+    },
+    {
+      "id": "AIAA-2022",
+      "title": "Internal Layout of a Lunar Surface Habitat",
+      "url": "https://ntrs.nasa.gov/api/citations/20220013669/downloads/Internal%20Layout%20of%20a%20Lunar%20Surface%20Habitat.pdf",
+      "year": 2022,
+      "conference": "AIAA ASCEND"
+    },
+    {
+      "id": "HERA-2019",
+      "title": "HERA Facility Documentation",
+      "year": 2019
+    },
+    {
+      "id": "UND-2020",
+      "title": "UND Lunar Daytime Behavioral Study",
+      "year": 2020
+    }
+  ],
+  "global_circulation": {
+    "crew_translation_path_min_width_m": 1.00,
+    "source": "AIAA-2022",
+    "rationale": "Minimum width for safe crew translation through habitat"
+  },
+  "structural_clearances": {
+    "crew_quarters_min_internal_dims": {
+      "width_m": 0.762,
+      "depth_m": 0.762,
+      "length_m_min": 1.981,
+      "source_units": "30 in × 30 in × >78 in",
+      "source": "NASA-TP-2020-220505"
+    },
+    "wcs_compartment_min_internal_dims": {
+      "width_m": 1.016,
+      "depth_m": 0.762,
+      "height_m": 1.981,
+      "source_units": "~40 in × 30 in × 78 in",
+      "source": "NASA-TP-2020-220505"
+    }
+  },
+  "atomic_functional_minima": [
+    {
+      "category": "Crew Habitation",
+      "function": "Access to Personal Stowage",
+      "min_volume_m3": 2.60,
+      "min_area_m2": 1.08,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Crew Habitation",
+      "function": "Changing Clothes",
+      "min_volume_m3": 2.40,
+      "min_area_m2": 1.00,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Crew Habitation",
+      "function": "Sleep Accommodation",
+      "min_volume_m3": 3.64,
+      "min_area_m2": 1.82,
+      "source": "AIAA-2022",
+      "notes": "Per crew member; private quarters strongly recommended per UND study"
+    },
+    {
+      "category": "Crew Habitation",
+      "function": "Stretching",
+      "min_volume_m3": 3.36,
+      "min_area_m2": 1.40,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "EVA Support",
+      "function": "Computer Display & Control",
+      "min_volume_m3": 2.24,
+      "min_area_m2": 1.12,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "EVA Support",
+      "function": "Suit Component Test/Repair",
+      "min_volume_m3": 3.28,
+      "min_area_m2": 1.37,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "EVA Support",
+      "function": "Temporary EVA Items Stowage",
+      "min_volume_m3": 0.25,
+      "min_area_m2": 0.25,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Exercise",
+      "function": "Resistive Exercise",
+      "min_volume_m3": 3.60,
+      "min_area_m2": 1.50,
+      "source": "AIAA-2022",
+      "notes": "Must be noise-isolated from crew quarters"
+    },
+    {
+      "category": "Group Socialization & Recreation",
+      "function": "Group Movie Viewing",
+      "min_volume_m3": 5.04,
+      "min_area_m2": 2.10,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Group Socialization & Recreation",
+      "function": "Group Tabletop Games",
+      "min_volume_m3": 3.89,
+      "min_area_m2": 1.62,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Group Socialization & Recreation",
+      "function": "Personal Recreation",
+      "min_volume_m3": 3.89,
+      "min_area_m2": 1.62,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Human Waste Collection",
+      "function": "Emesis Waste",
+      "min_volume_m3": 2.18,
+      "min_area_m2": 0.91,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Human Waste Collection",
+      "function": "Menses Waste",
+      "min_volume_m3": 2.18,
+      "min_area_m2": 0.91,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Human Waste Collection",
+      "function": "Liquid Waste",
+      "min_volume_m3": 2.18,
+      "min_area_m2": 0.91,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Human Waste Collection",
+      "function": "Solid Waste",
+      "min_volume_m3": 2.18,
+      "min_area_m2": 0.91,
+      "source": "AIAA-2022",
+      "notes": "WCS must be in separate compartment with rigid door"
+    },
+    {
+      "category": "Human Waste Collection",
+      "function": "WMS Maintenance & Repair",
+      "min_volume_m3": 2.18,
+      "min_area_m2": 0.91,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Meal Consumption",
+      "function": "Full Crew Dining",
+      "min_volume_m3": 3.89,
+      "min_area_m2": 1.62,
+      "source": "AIAA-2022",
+      "notes": "Critical for team cohesion per HERA studies"
+    },
+    {
+      "category": "Medical Operations",
+      "function": "Autonomous Ambulatory Care",
+      "min_volume_m3": 2.68,
+      "min_area_m2": 1.12,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Medical Operations",
+      "function": "Basic Medical Care",
+      "min_volume_m3": 4.49,
+      "min_area_m2": 1.87,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Medical Operations",
+      "function": "Telemedicine/Data Entry",
+      "min_volume_m3": 2.69,
+      "min_area_m2": 1.12,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Mission Planning",
+      "function": "Planning Interface Access",
+      "min_volume_m3": 4.37,
+      "min_area_m2": 1.82,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Mission Planning",
+      "function": "Work Surface Access",
+      "min_volume_m3": 3.89,
+      "min_area_m2": 1.62,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Mission Planning",
+      "function": "Team Meetings",
+      "min_volume_m3": 4.37,
+      "min_area_m2": 1.82,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Monitoring & Commanding",
+      "function": "Teleop/Comms Interface",
+      "min_volume_m3": 4.37,
+      "min_area_m2": 1.82,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Monitoring & Commanding",
+      "function": "Direct Window Viewing",
+      "min_volume_m3": 1.35,
+      "min_area_m2": 0.56,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Monitoring & Commanding",
+      "function": "Command/Control Interface",
+      "min_volume_m3": 4.37,
+      "min_area_m2": 1.82,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Hygiene",
+      "function": "Appearance/Body Inspection",
+      "min_volume_m3": 2.54,
+      "min_area_m2": 1.06,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Hygiene",
+      "function": "Facial Cleaning",
+      "min_volume_m3": 2.54,
+      "min_area_m2": 1.06,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Hygiene",
+      "function": "Fingernail/Toenail Clipping",
+      "min_volume_m3": 2.11,
+      "min_area_m2": 0.88,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Hygiene",
+      "function": "Full Body Cleaning",
+      "min_volume_m3": 2.54,
+      "min_area_m2": 1.06,
+      "source": "AIAA-2022",
+      "notes": "Must be separate from crew quarters to prevent cross-contamination"
+    },
+    {
+      "category": "Hygiene",
+      "function": "Hair Styling/Grooming",
+      "min_volume_m3": 2.54,
+      "min_area_m2": 1.06,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Hygiene",
+      "function": "Hand Cleaning",
+      "min_volume_m3": 2.54,
+      "min_area_m2": 1.06,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Hygiene",
+      "function": "Oral Hygiene",
+      "min_volume_m3": 2.11,
+      "min_area_m2": 0.88,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Hygiene",
+      "function": "Shaving",
+      "min_volume_m3": 2.11,
+      "min_area_m2": 0.88,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Hygiene",
+      "function": "Skin Care",
+      "min_volume_m3": 2.11,
+      "min_area_m2": 0.88,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Hygiene",
+      "function": "Towel/Clothes Drying",
+      "min_volume_m3": 2.11,
+      "min_area_m2": 0.88,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Logistics",
+      "function": "Packing & Inventory Mgmt",
+      "min_volume_m3": 3.28,
+      "min_area_m2": 1.37,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Maintenance & Repair",
+      "function": "Diagnostics Workstation",
+      "min_volume_m3": 3.28,
+      "min_area_m2": 1.37,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Maintenance & Repair",
+      "function": "Systems/Electronics Repair",
+      "min_volume_m3": 3.28,
+      "min_area_m2": 1.37,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Meal Preparation",
+      "function": "Food Item Sorting",
+      "min_volume_m3": 1.35,
+      "min_area_m2": 0.56,
+      "source": "AIAA-2022"
+    },
+    {
+      "category": "Meal Preparation",
+      "function": "Food Preparation",
+      "min_volume_m3": 1.35,
+      "min_area_m2": 0.56,
+      "source": "AIAA-2022",
+      "notes": "Galley must be separate from WCS to prevent contamination"
+    }
+  ],
+  "combined_spaces_min_areas": [
+    {
+      "combined_space": "Crew Quarters",
+      "min_area_m2": 1.82,
+      "min_volume_m3": 3.64,
+      "source": "AIAA-2022",
+      "notes": "Per crew member; includes sleep accommodation"
+    },
+    {
+      "combined_space": "Hygiene",
+      "min_area_m2": 1.06,
+      "min_volume_m3": 2.54,
+      "source": "AIAA-2022",
+      "notes": "Full body cleaning capability"
+    },
+    {
+      "combined_space": "WCS",
+      "min_area_m2": 0.91,
+      "min_volume_m3": 2.18,
+      "source": "AIAA-2022",
+      "notes": "Waste Collection System; must have rigid door and ventilation"
+    },
+    {
+      "combined_space": "Exercise",
+      "min_area_m2": 1.50,
+      "min_volume_m3": 3.60,
+      "source": "AIAA-2022",
+      "notes": "Resistive exercise equipment"
+    },
+    {
+      "combined_space": "Galley",
+      "min_area_m2": 0.56,
+      "min_volume_m3": 1.35,
+      "source": "AIAA-2022",
+      "notes": "Food preparation area"
+    },
+    {
+      "combined_space": "Ward/Dining",
+      "min_area_m2": 1.62,
+      "min_volume_m3": 3.89,
+      "source": "AIAA-2022",
+      "notes": "Full crew dining and socialization"
+    },
+    {
+      "combined_space": "Workstation",
+      "min_area_m2": 1.37,
+      "min_volume_m3": 3.28,
+      "source": "AIAA-2022",
+      "notes": "General work surface and computer station"
+    },
+    {
+      "combined_space": "Medical",
+      "min_area_m2": 1.87,
+      "min_volume_m3": 4.49,
+      "source": "AIAA-2022",
+      "notes": "Basic medical care capability"
+    }
+  ],
+  "zones": {
+    "clean": {
+      "modules": [
+        "Crew Quarters",
+        "Galley",
+        "Ward/Dining",
+        "Workstation",
+        "Medical"
+      ],
+      "description": "Areas requiring low contamination and quiet environment",
+      "source": "NASA-TP-2020-220505"
+    },
+    "dirty": {
+      "modules": [
+        "WCS",
+        "Hygiene",
+        "Exercise",
+        "IFM/Repair",
+        "Trash"
+      ],
+      "description": "Areas with higher contamination potential or noise generation",
+      "source": "NASA-TP-2020-220505"
+    }
+  },
+  "adjacency_rules": [
+    {
+      "rule": "separate_from",
+      "a": "Hygiene",
+      "b": "Crew Quarters",
+      "rationale": "Prevent cross-contamination; crew quarters must remain dry and quiet",
+      "source": "NASA-TP-2020-220505",
+      "severity": "high"
+    },
+    {
+      "rule": "separate_from",
+      "a": "Hygiene",
+      "b": "WCS",
+      "rationale": "Dedicated, enclosed hygiene; WCS reserved for WCS operations only",
+      "source": "NASA-TP-2020-220505",
+      "severity": "medium"
+    },
+    {
+      "rule": "separate_from",
+      "a": "WCS",
+      "b": "Galley",
+      "rationale": "Reduce cross-contamination with food preparation areas",
+      "source": "NASA-TP-2020-220505",
+      "severity": "critical"
+    },
+    {
+      "rule": "noise_isolate",
+      "a": "Crew Quarters",
+      "b": "Exercise",
+      "rationale": "Exercise should be separated from sleep areas to limit noise and cross-contamination",
+      "source": "NASA-TP-2020-220505",
+      "severity": "high",
+      "min_distance_m": 2.0
+    },
+    {
+      "rule": "co_locate_with",
+      "a": "Crew Quarters",
+      "b": "Clean Functions Cluster",
+      "rationale": "Quiet/clean zone with galley, science, medical",
+      "source": "NASA-TP-2020-220505",
+      "severity": "medium"
+    },
+    {
+      "rule": "co_locate_with",
+      "a": "WCS",
+      "b": "Dirty Functions Cluster",
+      "rationale": "Group dirty functions to localize contamination and cleaning burden",
+      "source": "NASA-TP-2020-220505",
+      "severity": "medium"
+    },
+    {
+      "rule": "path_width_min",
+      "a": "Translation Paths",
+      "value_m": 1.00,
+      "rationale": "Crew translation minimum width for safe passage",
+      "source": "AIAA-2022",
+      "severity": "critical"
+    }
+  ],
+  "habitat_shell": {
+    "default_dimensions": {
+      "width_m": 12.0,
+      "depth_m": 8.0,
+      "height_m": 3.0,
+      "notes": "Representative dimensions for rigid cylindrical lunar habitat module"
+    },
+    "types": [
+      {
+        "type": "rigid",
+        "description": "Metallic habitat launched in usable form",
+        "max_diameter_m": 8.0,
+        "max_length_m": 12.0
+      },
+      {
+        "type": "inflatable",
+        "description": "Habitat stowed for launch and deployed at point of use",
+        "max_diameter_m": 10.0,
+        "max_length_m": 15.0
+      }
+    ]
+  },
+  "mission_context": {
+    "hera_baseline": {
+      "crew_size": 4,
+      "mission_days": 45,
+      "isolation_protocol": "restricted_personal_comms_weekly_family_conf",
+      "source": "HERA-2019"
+    },
+    "und_behavioral_factors": {
+      "privacy_impact": "high",
+      "window_type_impact": "medium",
+      "circulation_pattern_impact": "medium",
+      "visual_order_impact": "medium",
+      "adjacency_compliance_impact": "high",
+      "source": "UND-2020"
+    }
+  }
+}

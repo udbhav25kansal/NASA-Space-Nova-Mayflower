@@ -1,0 +1,32 @@
+Summary
+Space habitats are “homes in space” that keep crew members healthy and able to execute their mission. Whether located on a planetary surface or in space, habitats must support critical functions such as waste management, thermal control, life support, communications, power, stowage, food storage and preparation, medical care, sleep, and exercise. Space habitat concepts can involve a diverse array of materials, geometries, and layouts. Your challenge is to create a visual tool that enables users to define a space habitat’s shape/volume and explore possible layout options.
+
+Background
+NASA plans to return humans to the Moon and enable a sustained presence there through the Artemis campaign. The Moon will serve as a proving ground for technologies and operational approaches that will inform future human missions to Mars. Space habitats can potentially support crews on the Moon, in transit to Mars, and on the Martian surface, enabling longer mission durations, increased crew sizes, and comprehensive science investigations. Space habitat designers must consider not only the structural, manufacturing, and material options that can be used to construct a habitat, but also the constraints imposed by delivery/deployment methods (e.g., the capacity of a lunar surface landing system and/or a launch vehicle). In addition, a space habitat must provide numerous functions to support the required number of crew members for the specified mission duration at the final destination and/or while they are in transit to that destination.
+
+There are generally three different classes of space habitat structures: metallic habitats that are launched from Earth in their usable form, inflatable habitats that are stowed for launch and deployed at the point of use, and habitats that can be manufactured on a planetary surface, potentially from indigenous resources. Examples of habitat concepts and layouts previously developed by NASA as well as a reference document about the habitat volumes needed to support specific crew functions are included in the Resources tab.
+
+While there are existing software tools that can help users design the physical layout of a structure, it takes a non-trivial amount of time to create a concept for a space habitat—especially when the designer needs to consider many different options. In addition, some of these tools require a high level of expertise/familiarity with the software to use them effectively, and many do not include certain features that would aid a space habitat designer.
+
+Objectives
+Your challenge is to create an easy-to-use, accessible visual tool for creating and assessing space habitat layouts. The objective of the tool is to enable users to: 1) create an overall habitat design given a variety of options, 2) determine what functional areas will fit within the space and where, and 3) quickly try out different options and approaches for various mission scenarios.
+
+Think about the different constraints users will need to consider as they define a habitat’s shape and volume. Aspects such as launch vehicle payload fairing size and shape, the habitat’s destination/use environment, crew size, and mission duration are important. Are there any other factors to consider? Once the dimensions and shape of the habitat are defined, ensure that the user can partition the volume to show different areas devoted to various functions (e.g., waste management, hygiene, environmental control and life support, crew recreation, stowage, food storage and meal preparation, maintenance and repair activities, sleep and exercise). Could your tool impose “rules” to ensure that functional areas are sized appropriately for a certain number of crew and a specific mission duration, offering the user feedback when an area is too small?
+
+How can your tool support an iterative design process, such as analysis of multiple layout options and scaling of crew sizes within a given volume? Will your tool offer options to create multiple levels within the habitat and/or locate functional areas radially around a central core, or other alternatives?
+
+Your project can be an app, a game, a website, or be presented in another visual format with a user interface. Your tool could even incorporate a social component that enables users to share their designs with a community of other users. The ultimate goal of the tool is to help educate users about space habitation and enable them to experiment with their own space habitat designs.
+
+Potential Considerations
+You may (but are not required to) consider the following:
+
+Your target audience can include students at multiple levels as well as engineering professionals. The goal is to make the tool accessible, fun, and easy to use, but also useful for those who may work in the space field.
+Your tool could enable the user to engage with habitat design/layout in an interactive manner by allowing them to:
+Select habitat shapes and define dimensions.
+Consider different crew sizes, mission durations, and destinations.
+Specify functional areas and explore different layouts within the habitat.
+Draw and measure access paths between areas.
+Bring objects into the virtual environment and resize them (e.g., human models, spacesuits, stowage bags, plant growth facilities, a medical kit). If you can envision it on a space mission, it can be part of your habitat! You can use the NASA references provided (see Resources tab) to identity items you might populate a habitat with.
+Consider how your tool could provide quantitative outputs regarding the layout designed by the user, including floor area and volume of specific spaces within the habitat. For example, your tool could provide visual feedback on the user’s design (e.g., “green” if an area defined by the user meets constraints vs. “red” if it doesn’t).
+Consider how your tool could enable “zoning” of the habitat, which would allow the user to incorporate best practices and guidance from NASA (see Resources tab) on placement of functions within a habitat (i.e., which areas should be placed adjacent to each other and which areas should be segregated, based on crew experiences/feedback). For example, the user may want crew sleep areas to be well separated from areas that are noisy, or a food preparation area to be set apart from an exercise area or hygiene area.
+For data and resources related to this challenge, refer to the Resources tab at the top of the page.

@@ -1,0 +1,28 @@
+{
+  "name": "habitat-harmony-ls2",
+  "version": "1.0.0",
+  "description": "Habitat Harmony: Lunar Stress Layout Simulator - A NASA-data-driven interactive Three.js simulator for evaluating psychological resilience in lunar habitat layouts",
+  "type": "module",
+  "main": "src/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "nasa",
+    "space-apps",
+    "habitat",
+    "three.js",
+    "lunar",
+    "simulator"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "three": "^0.180.0"
+  },
+  "devDependencies": {
+    "vite": "^6.3.6"
+  }
+}
