@@ -37,26 +37,54 @@ export default class HabitatConfigurator {
    */
   async loadHabitatTypes() {
     try {
+      console.log('🔄 Loading habitat types from /src/data/habitat-types.json...');
       const response = await fetch('/src/data/habitat-types.json');
+
       if (!response.ok) {
-        throw new Error(`Failed to load habitat types: ${response.status}`);
+        throw new Error(`Failed to load habitat types: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
+      console.log('📦 Raw data loaded:', data);
+
       this.habitatTypes = data.habitat_types;
       this.launchVehicles = data.launch_vehicle_constraints;
       this.selectedType = this.habitatTypes.find(t => t.id === 'hybrid_transhab');
       this.isLoaded = true;
 
-      // Re-render if already created
+      console.log(`✅ Habitat types loaded: ${this.habitatTypes.length} types`);
+      console.log('📋 Types:', this.habitatTypes.map(t => t.id));
+
+      // Force re-render if already created
       if (this.panel) {
-        this.render();
+        console.log('🔄 Re-rendering panel with loaded data...');
+        const catalogContainer = document.getElementById('catalogContainer');
+        if (catalogContainer) {
+          // Remove old panel
+          const oldPanel = document.getElementById('habitat-configurator');
+          if (oldPanel) {
+            oldPanel.remove();
+          }
+          // Re-render with data
+          this.render();
+        }
       }
 
-      console.log('✅ Habitat types loaded:', this.habitatTypes.length);
     } catch (error) {
-      console.error('Failed to load habitat types:', error);
+      console.error('❌ Failed to load habitat types:', error);
+      console.error('Error details:', error.message);
       this.isLoaded = false;
+
+      // Show error in UI
+      if (this.panel) {
+        this.panel.innerHTML = `
+          <div style="padding: 20px; text-align: center; color: #dc2626;">
+            <div style="font-size: 24px; margin-bottom: 8px;">⚠️</div>
+            <div style="font-weight: 600;">Failed to load habitat data</div>
+            <div style="font-size: 11px; margin-top: 4px;">${error.message}</div>
+          </div>
+        `;
+      }
     }
   }
 
@@ -522,10 +550,17 @@ export default class HabitatConfigurator {
       // Create panel for first time
       this.panel = this.create();
 
-      // Insert into DOM (before catalog if it exists)
-      const catalog = document.getElementById('catalog');
-      if (catalog && catalog.parentElement) {
-        catalog.parentElement.insertBefore(this.panel, catalog);
+      // Find the left sidebar container
+      const sidebar = document.querySelector('.left-sidebar');
+      if (sidebar) {
+        // Insert at the top of the sidebar
+        sidebar.insertBefore(this.panel, sidebar.firstChild);
+      } else {
+        // Fallback: Insert before catalog if it exists
+        const catalog = document.getElementById('catalog');
+        if (catalog && catalog.parentElement) {
+          catalog.parentElement.insertBefore(this.panel, catalog);
+        }
       }
     } else if (this.isLoaded) {
       // Re-render with loaded data
@@ -535,5 +570,36 @@ export default class HabitatConfigurator {
       }
       this.panel = newPanel;
     }
+  }
+
+  /**
+   * Set configuration programmatically (for scenario loader)
+   */
+  setConfiguration(config) {
+    if (config.type) {
+      this.currentConfig.type = config.type;
+      const typeSelect = document.getElementById('habitat-type-select');
+      if (typeSelect) {
+        typeSelect.value = config.type;
+        this.handleTypeChange(config.type);
+      }
+    }
+    if (config.width !== undefined) this.currentConfig.width = config.width;
+    if (config.depth !== undefined) this.currentConfig.depth = config.depth;
+    if (config.height !== undefined) this.currentConfig.height = config.height;
+    if (config.levels !== undefined) this.currentConfig.levels = config.levels;
+
+    this.updateMetrics();
+    this.notifyConfigChange();
+  }
+
+  /**
+   * Clean up event listeners (prevent memory leaks)
+   */
+  destroy() {
+    if (this.panel && this.panel.parentElement) {
+      this.panel.parentElement.removeChild(this.panel);
+    }
+    this.panel = null;
   }
 }
