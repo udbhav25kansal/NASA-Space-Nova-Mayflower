@@ -38,7 +38,12 @@ export default class SceneManager {
   init() {
     // Create scene
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0xffffff);
+
+    // Lunar space background (dark with stars)
+    this.scene.background = new THREE.Color(0x0a0a0a);
+
+    // Add starfield
+    this.addStarfield();
 
     // Setup camera (Orthographic for 2.5D view)
     this.setupCamera();
@@ -49,8 +54,11 @@ export default class SceneManager {
     // Setup controls
     this.setupControls();
 
-    // Setup lighting
+    // Setup lighting (harsh lunar sun)
     this.setupLighting();
+
+    // Add lunar surface floor
+    this.addLunarSurface();
 
     // Handle window resize
     window.addEventListener('resize', () => this.onWindowResize(), false);
@@ -59,7 +67,8 @@ export default class SceneManager {
     this.animate();
 
     console.log('✅ SceneManager initialized');
-    console.log('📐 Camera: Orthographic 2.5D view');
+    console.log('🌙 Lunar environment with low-gravity feel');
+    console.log('📐 Camera: Orthographic with full rotation');
     console.log('🎯 Coordinate system: X/Z horizontal, Y vertical, units in meters');
   }
 
@@ -118,48 +127,57 @@ export default class SceneManager {
 
   /**
    * Setup OrbitControls for camera manipulation
-   * Pan and zoom enabled, rotation disabled for 2.5D view
+   * Pan, zoom, and rotation all enabled for full 3D navigation
    */
   setupControls() {
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 
-    // Enable pan and zoom
+    // Enable pan, zoom, and rotate for full 3D control
     this.controls.enablePan = true;
     this.controls.enableZoom = true;
-
-    // Disable rotation to maintain 2.5D view
-    this.controls.enableRotate = false;
+    this.controls.enableRotate = true;  // ✅ ENABLED for user rotation
 
     // Configure zoom
     this.controls.zoomSpeed = 1.0;
-    this.controls.minZoom = 0.5;
-    this.controls.maxZoom = 3.0;
+    this.controls.minZoom = 0.3;  // Allow zooming out further
+    this.controls.maxZoom = 5.0;  // Allow zooming in closer
 
     // Configure pan
     this.controls.panSpeed = 1.0;
     this.controls.screenSpacePanning = true;
 
-    // Damping for smooth controls
+    // Configure rotation
+    this.controls.rotateSpeed = 0.5;
+    this.controls.minPolarAngle = Math.PI / 6;  // Limit rotation (30° from top)
+    this.controls.maxPolarAngle = Math.PI / 2.2; // Don't allow looking from below
+
+    // Damping for smooth, floaty controls (lunar low-gravity feel)
     this.controls.enableDamping = true;
-    this.controls.dampingFactor = 0.05;
+    this.controls.dampingFactor = 0.08;  // Slower damping = floaty feel
   }
 
   /**
    * Setup scene lighting
-   * Using HemisphereLight for even, shadowless illumination
+   * Harsh directional sunlight to simulate lunar environment (no atmosphere)
    */
   setupLighting() {
-    // Hemisphere light: sky color, ground color, intensity
+    // Harsh sun (directional light from above-left)
+    const sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
+    sunLight.position.set(-10, 20, 10);
+    sunLight.castShadow = false;  // Disabled for performance
+    this.scene.add(sunLight);
+
+    // Minimal ambient light (lunar shadows are very dark)
+    const ambientLight = new THREE.AmbientLight(0x404060, 0.4);
+    this.scene.add(ambientLight);
+
+    // Add subtle hemisphere for earth-shine (from above)
     const hemiLight = new THREE.HemisphereLight(
-      0xffffff,  // sky color (white)
-      0xcccccc,  // ground color (light gray)
-      1.0        // intensity
+      0x87ceeb,  // sky color (slight blue from Earth)
+      0x2a2a2a,  // ground color (dark lunar surface)
+      0.3        // low intensity
     );
     this.scene.add(hemiLight);
-
-    // Optional: Add subtle ambient light
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
-    this.scene.add(ambientLight);
   }
 
   /**
@@ -262,6 +280,81 @@ export default class SceneManager {
    */
   getControls() {
     return this.controls;
+  }
+
+  /**
+   * Add starfield background for lunar space environment
+   */
+  addStarfield() {
+    const starGeometry = new THREE.BufferGeometry();
+    const starCount = 1000;
+    const positions = new Float32Array(starCount * 3);
+
+    for (let i = 0; i < starCount * 3; i += 3) {
+      // Random position in sphere around scene
+      positions[i] = (Math.random() - 0.5) * 200;     // x
+      positions[i + 1] = Math.random() * 100 + 20;    // y (above horizon)
+      positions[i + 2] = (Math.random() - 0.5) * 200; // z
+    }
+
+    starGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+    const starMaterial = new THREE.PointsMaterial({
+      color: 0xffffff,
+      size: 0.2,
+      sizeAttenuation: false
+    });
+
+    const stars = new THREE.Points(starGeometry, starMaterial);
+    this.scene.add(stars);
+  }
+
+  /**
+   * Add lunar surface floor with crater-like details
+   */
+  addLunarSurface() {
+    // Large lunar ground plane
+    const groundSize = 50;
+    const groundGeometry = new THREE.PlaneGeometry(groundSize, groundSize, 64, 64);
+
+    // Add crater-like deformations
+    const positions = groundGeometry.attributes.position;
+    for (let i = 0; i < positions.count; i++) {
+      const x = positions.getX(i);
+      const z = positions.getY(i);  // Note: PlaneGeometry Y is our Z
+
+      // Create crater bumps using noise-like function
+      const crater1 = Math.exp(-((x - 10) ** 2 + (z - 10) ** 2) / 8) * -0.5;
+      const crater2 = Math.exp(-((x + 8) ** 2 + (z + 5) ** 2) / 12) * -0.3;
+      const crater3 = Math.exp(-((x - 5) ** 2 + (z - 15) ** 2) / 6) * -0.4;
+
+      // Small random surface noise
+      const noise = (Math.random() - 0.5) * 0.05;
+
+      // Set height (y becomes z in our coordinate system)
+      positions.setZ(i, crater1 + crater2 + crater3 + noise);
+    }
+
+    groundGeometry.computeVertexNormals();
+
+    // Lunar regolith material (gray-brown with slight texture)
+    const groundMaterial = new THREE.MeshStandardMaterial({
+      color: 0x8b8680,  // Lunar gray
+      roughness: 0.95,
+      metalness: 0.0,
+      flatShading: false
+    });
+
+    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+    ground.rotation.x = -Math.PI / 2;  // Rotate to be horizontal
+    ground.position.y = -0.1;  // Slightly below origin
+    ground.receiveShadow = true;
+    this.scene.add(ground);
+
+    // Add subtle grid helper for reference (very faint)
+    const gridHelper = new THREE.GridHelper(20, 40, 0x444444, 0x222222);
+    gridHelper.position.y = 0;
+    this.scene.add(gridHelper);
   }
 
   /**
