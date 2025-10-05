@@ -13,79 +13,52 @@
 export default class HabitatConfigurator {
   constructor(onConfigChange) {
     this.onConfigChange = onConfigChange;
-    this.habitatTypes = [];
-    this.launchVehicles = {};
-    this.selectedType = null;
-    this.isLoaded = false;
 
-    // Default to NASA Mars Transit Habitat (Hybrid TransHab)
+    // Embedded habitat types (no async loading needed)
+    this.habitatTypes = [
+      {
+        id: 'rectangular_base',
+        name: 'Rectangular Base',
+        type: 'rigid',
+        description: 'Standard lunar surface habitat - 12m × 8m floor plan',
+        dimensions: { width: 12.0, depth: 8.0, height: 3.0 }
+      },
+      {
+        id: 'large_base',
+        name: 'Large Base',
+        type: 'rigid',
+        description: 'Extended habitat - 16m × 12m for more crew',
+        dimensions: { width: 16.0, depth: 12.0, height: 3.0 }
+      },
+      {
+        id: 'compact_base',
+        name: 'Compact Base',
+        type: 'rigid',
+        description: 'Small crew habitat - 8m × 6m efficient layout',
+        dimensions: { width: 8.0, depth: 6.0, height: 3.0 }
+      },
+      {
+        id: 'cylindrical',
+        name: 'Cylindrical Module',
+        type: 'inflatable',
+        description: 'Inflatable habitat - 10m diameter × 10m length',
+        dimensions: { width: 10.0, depth: 10.0, height: 3.5 }
+      }
+    ];
+
+    this.selectedType = this.habitatTypes[0];
+    this.isLoaded = true;
+
+    // Default config
     this.currentConfig = {
-      type: 'hybrid_transhab',
-      width: 12.0,  // For grid compatibility (8m inflatable + margins)
-      depth: 8.0,   // Max diameter of inflatable
-      height: 3.0,  // Per level height
-      levels: 1,    // Start with single level (will show 3-level option for hybrid)
-      launchVehicle: 'sls_block_1'
+      type: 'rectangular_base',
+      width: 12.0,
+      depth: 8.0,
+      height: 3.0,
+      levels: 1
     };
 
-    // Load habitat types data
-    this.loadHabitatTypes();
-  }
-
-  /**
-   * Load habitat types from JSON file
-   */
-  async loadHabitatTypes() {
-    try {
-      console.log('🔄 Loading habitat types from /src/data/habitat-types.json...');
-      const response = await fetch('/src/data/habitat-types.json');
-
-      if (!response.ok) {
-        throw new Error(`Failed to load habitat types: ${response.status} ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      console.log('📦 Raw data loaded:', data);
-
-      this.habitatTypes = data.habitat_types;
-      this.launchVehicles = data.launch_vehicle_constraints;
-      this.selectedType = this.habitatTypes.find(t => t.id === 'hybrid_transhab');
-      this.isLoaded = true;
-
-      console.log(`✅ Habitat types loaded: ${this.habitatTypes.length} types`);
-      console.log('📋 Types:', this.habitatTypes.map(t => t.id));
-
-      // Force re-render if already created
-      if (this.panel) {
-        console.log('🔄 Re-rendering panel with loaded data...');
-        const catalogContainer = document.getElementById('catalogContainer');
-        if (catalogContainer) {
-          // Remove old panel
-          const oldPanel = document.getElementById('habitat-configurator');
-          if (oldPanel) {
-            oldPanel.remove();
-          }
-          // Re-render with data
-          this.render();
-        }
-      }
-
-    } catch (error) {
-      console.error('❌ Failed to load habitat types:', error);
-      console.error('Error details:', error.message);
-      this.isLoaded = false;
-
-      // Show error in UI
-      if (this.panel) {
-        this.panel.innerHTML = `
-          <div style="padding: 20px; text-align: center; color: #dc2626;">
-            <div style="font-size: 24px; margin-bottom: 8px;">⚠️</div>
-            <div style="font-weight: 600;">Failed to load habitat data</div>
-            <div style="font-size: 11px; margin-top: 4px;">${error.message}</div>
-          </div>
-        `;
-      }
-    }
+    console.log('✅ HabitatConfigurator initialized with', this.habitatTypes.length, 'habitat types');
   }
 
   /**
@@ -104,40 +77,7 @@ export default class HabitatConfigurator {
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     `;
 
-    // Show loading state if data not loaded yet
-    if (!this.isLoaded) {
-      panel.innerHTML = `
-        <div style="margin-bottom: 12px;">
-          <div style="font-size: 11px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
-            🌙 Habitat Configuration
-          </div>
-          <div style="font-size: 12px; color: #64748b; padding: 32px 20px; text-align: center; background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 51, 234, 0.05) 100%); border-radius: 8px; border: 2px dashed #cbd5e1;">
-            <div style="font-size: 24px; margin-bottom: 8px; animation: pulse 2s ease-in-out infinite;">🚀</div>
-            <div style="font-weight: 600; color: #475569; margin-bottom: 4px;">Loading NASA Habitat Types...</div>
-            <div style="font-size: 10px; color: #94a3b8;">Fetching validated configurations from IEEE & NASA sources</div>
-          </div>
-          <div style="margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-            ${[1,2,3,4].map(i => `
-              <div style="padding: 12px; background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); border-radius: 6px; border: 1px solid #cbd5e1;">
-                <div style="height: 8px; width: 60%; background: #cbd5e1; border-radius: 4px; margin-bottom: 6px;"></div>
-                <div style="height: 6px; width: 90%; background: #e2e8f0; border-radius: 3px; margin-bottom: 4px;"></div>
-                <div style="height: 6px; width: 75%; background: #e2e8f0; border-radius: 3px;"></div>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-        <style>
-          @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.8; }
-          }
-        </style>
-      `;
-
-      this.panel = panel;
-      return panel;
-    }
-
+    // Data is always loaded (embedded), so directly create UI
     panel.innerHTML = `
       <div style="margin-bottom: 12px;">
         <div style="font-size: 11px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
@@ -152,7 +92,7 @@ export default class HabitatConfigurator {
         </label>
         <select id="habitat-type-select" style="width: 100%; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; background: white; cursor: pointer;">
           ${this.habitatTypes.map(type => `
-            <option value="${type.id}" ${type.id === 'hybrid_transhab' ? 'selected' : ''}>
+            <option value="${type.id}" ${type.id === 'rectangular_base' ? 'selected' : ''}>
               ${type.name}
             </option>
           `).join('')}
