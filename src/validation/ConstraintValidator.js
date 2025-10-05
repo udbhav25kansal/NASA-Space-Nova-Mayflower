@@ -455,4 +455,50 @@ export default class ConstraintValidator {
 
     return summary;
   }
+
+  /**
+   * Calculate adjacency compliance as a ratio (0-1)
+   * Used by Phase 2 psychological simulation
+   * @param {Array<HabitatModule>} modules - All modules in layout
+   * @returns {Number} Compliance ratio (1.0 = perfect, 0.0 = all rules violated)
+   */
+  calculateAdjacencyCompliance(modules) {
+    try {
+      // Validate input
+      if (!modules || !Array.isArray(modules) || modules.length === 0) {
+        return 1.0; // No modules = perfect compliance
+      }
+
+      // Get all adjacency rules
+      const rules = this.constraints.adjacency_rules || [];
+
+      if (rules.length === 0) {
+        return 1.0; // No rules = perfect compliance
+      }
+
+      // Count how many rules are applicable (both modules present in layout)
+      const applicableRules = rules.filter(rule => {
+        const hasModuleA = modules.some(m => m.moduleName === rule.a || m.moduleName === rule.b);
+        const hasModuleB = modules.some(m => m.moduleName === rule.b || m.moduleName === rule.a);
+        return hasModuleA && hasModuleB;
+      });
+
+      if (applicableRules.length === 0) {
+        return 1.0; // No applicable rules = perfect compliance
+      }
+
+      // Check violations for applicable rules
+      const violations = this.validateAdjacency(modules);
+
+      // Calculate compliance ratio
+      const violatedRules = violations.length;
+      const compliance = Math.max(0, 1 - (violatedRules / applicableRules.length));
+
+      return compliance;
+
+    } catch (error) {
+      console.error('Error calculating adjacency compliance:', error);
+      return 0.5; // Default to medium compliance on error
+    }
+  }
 }

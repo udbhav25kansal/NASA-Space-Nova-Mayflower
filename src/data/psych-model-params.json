@@ -1,0 +1,154 @@
+{
+  "version": "1.0.0",
+  "description": "HERA + UND Lunar Daytime Behavioral Study - Psychological Model Parameters",
+  "sources": [
+    "HERA Facility Documentation (2019) - NASA Human Research Program",
+    "UND Lunar Daytime Behavioral Study (2020)",
+    "NASA/TP-2020-220505 - Deep Space Habitability Design Guidelines"
+  ],
+
+  "hera_context": {
+    "crew_size": 4,
+    "mission_days": 45,
+    "isolation_protocol": "restricted_personal_comms_weekly_family_conf",
+    "lighting_type": "adjustable_led_with_circadian_support",
+    "capabilities": {
+      "virtual_windows": true,
+      "exercise_equipment": true,
+      "hygiene_facilities": true,
+      "medical_support": "telemedicine_only"
+    }
+  },
+
+  "baseline_trends": {
+    "description": "Linear drift over mission duration (τ = t/45 ∈ [0,1])",
+    "stress": {
+      "s0": 40,
+      "s1": 25,
+      "notes": "Stress drifts from 40 → 65 over 45 days (HERA isolation effect)"
+    },
+    "mood": {
+      "m0": 70,
+      "m1": 20,
+      "notes": "Mood drifts from 70 → 50 over 45 days"
+    },
+    "sleep_quality": {
+      "q0": 70,
+      "q1": 10,
+      "notes": "Sleep quality drifts from 70 → 60"
+    },
+    "cohesion": {
+      "c0": 70,
+      "c1": 15,
+      "notes": "Team cohesion drifts from 70 → 55"
+    }
+  },
+
+  "damping_factors": {
+    "description": "Autoregressive damping (0-1) for day-to-day carryover",
+    "lambda_stress": 0.7,
+    "lambda_mood": 0.7,
+    "lambda_sleep": 0.7,
+    "lambda_cohesion": 0.7,
+    "notes": "λ=0.7 means 70% carryover from previous day"
+  },
+
+  "design_variable_weights": {
+    "description": "Coefficients from UND LDT Study correlating design to psychology",
+
+    "stress_modifiers": {
+      "alpha_privacy": 10,
+      "alpha_window": 6,
+      "alpha_visual_order": 4,
+      "alpha_lighting": 4,
+      "alpha_adjacency": 6,
+      "notes": "ΔStress(t) = -αP·P - αW·W - αV·V - αL·L - αA·A (negative = reduces stress)"
+    },
+
+    "mood_modifiers": {
+      "beta_privacy": 8,
+      "beta_window": 6,
+      "beta_visual_order": 4,
+      "beta_recreation": 3,
+      "beta_exercise": 5,
+      "notes": "ΔMood(t) = +βP·P + βW·W + βV·V + βR·R + βE·E (positive = improves mood)"
+    },
+
+    "sleep_modifiers": {
+      "gamma_privacy": 8,
+      "gamma_adjacency": 6,
+      "gamma_lighting": 6,
+      "gamma_exercise": 3,
+      "notes": "ΔSleep(t) = +γP·P + γA·A + γL·L + γE·E"
+    },
+
+    "cohesion_modifiers": {
+      "delta_recreation": 5,
+      "delta_visual_order": 3,
+      "delta_adjacency": 3,
+      "notes": "ΔCohesion(t) = +δR·R + δV·V + δA·A"
+    }
+  },
+
+  "design_variable_mappings": {
+    "description": "How layout features map to [0,1] design variables",
+
+    "P_private_sleep_quarters": {
+      "formula": "num_crew_quarters / crew_size",
+      "range": [0, 1],
+      "notes": "1.0 = every crew member has private sleep area"
+    },
+
+    "W_window_type": {
+      "values": {
+        "none": 0,
+        "digital_virtual": 0.5,
+        "physical": 1.0
+      },
+      "notes": "User-selectable in mission config"
+    },
+
+    "V_visual_order": {
+      "formula": "1 - (num_overlaps / max_possible_overlaps)",
+      "range": [0, 1],
+      "notes": "1.0 = no module overlaps, clean layout"
+    },
+
+    "L_lighting_schedule_compliance": {
+      "range": [0, 1],
+      "notes": "User-selectable slider (0=no circadian lighting, 1=full compliance)"
+    },
+
+    "A_adjacency_compliance": {
+      "formula": "1 - (num_violations / num_applicable_rules)",
+      "range": [0, 1],
+      "notes": "Already computed by ConstraintValidator"
+    },
+
+    "R_recreation_area": {
+      "formula": "(ward_dining_area + exercise_area) / total_area",
+      "range": [0, 1],
+      "notes": "Fraction of habitat devoted to recreation/dining"
+    },
+
+    "E_exercise_compliance": {
+      "range": [0, 1],
+      "notes": "User-selectable slider (0=no exercise, 1=daily HERA schedule)"
+    },
+
+    "C_circulation_pattern": {
+      "values": {
+        "tree_dead_end": 0,
+        "loop": 1
+      },
+      "notes": "1.0 = loop allows continuous circulation without dead-ends"
+    }
+  },
+
+  "validation_ranges": {
+    "stress": { "min": 0, "max": 100, "optimal": [20, 40] },
+    "mood": { "min": 0, "max": 100, "optimal": [60, 80] },
+    "sleep_quality": { "min": 0, "max": 100, "optimal": [60, 80] },
+    "cohesion": { "min": 0, "max": 100, "optimal": [60, 80] }
+  }
+}

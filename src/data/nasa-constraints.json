@@ -519,5 +519,74 @@
       "adjacency_compliance_impact": "high",
       "source": "UND-2020"
     }
+  },
+  "recreation_requirements": {
+    "min_area_per_crew_m2": 1.5,
+    "recommended_area_per_crew_m2": 2.0,
+    "total_social_space_min_m2": 6.0,
+    "notes": "Aggregate of Ward/Dining and Recreation areas",
+    "source": "AIAA-2022 + HERA common area design",
+    "rationale": "Adequate social space critical for team cohesion and stress management"
+  },
+  "sleep_quality_factors": {
+    "private_quarters_bonus": 20,
+    "exercise_adjacency_penalty": 30,
+    "lighting_compliance_weight": 20,
+    "sleep_debt_threshold_days": 7,
+    "sleep_debt_penalty": 15,
+    "notes": "Penalties/bonuses applied to baseline sleep quality score (0-100)",
+    "source": "NASA sleep research + TP-2020-220505 adjacency rules",
+    "rationale": "Sleep quality degradation compounds over time and impacts performance"
+  },
+  "performance_thresholds": {
+    "stress_moderate_threshold": 50,
+    "stress_high_threshold": 75,
+    "stress_performance_modifier_moderate": 0.01,
+    "stress_performance_modifier_high": 0.02,
+    "sleep_quality_threshold": 60,
+    "sleep_quality_performance_modifier": 0.005,
+    "cohesion_bonus_threshold": 70,
+    "cohesion_performance_modifier": 0.003,
+    "notes": "Performance degradation formulas based on psychological state",
+    "source": "NASA-TM-2016-218603 Behavioral Health and Performance",
+    "rationale": "Stress and fatigue directly impact crew cognitive performance and safety"
+  },
+  "privacy_requirements": {
+    "min_sleep_area_per_person_m2": 1.82,
+    "gender_segregation_required": true,
+    "private_quarters_preferred": true,
+    "max_occupants_per_shared_quarters": 2,
+    "notes": "Privacy critical for psychological health in long-duration missions",
+    "source": "TP-2020-220505 + HERA crew feedback",
+    "rationale": "Individual privacy reduces stress and improves sleep quality"
+  },
+  "crew_configuration_defaults": {
+    "standard_crew": {
+      "size": 4,
+      "composition": [
+        {"role": "Commander", "gender": "M"},
+        {"role": "Engineer", "gender": "F"},
+        {"role": "Scientist", "gender": "M"},
+        {"role": "Medical Officer", "gender": "F"}
+      ]
+    },
+    "small_crew": {
+      "size": 2,
+      "composition": [
+        {"role": "Commander", "gender": "M"},
+        {"role": "Engineer", "gender": "F"}
+      ]
+    },
+    "large_crew": {
+      "size": 6,
+      "composition": [
+        {"role": "Commander", "gender": "M"},
+        {"role": "Pilot", "gender": "F"},
+        {"role": "Engineer", "gender": "M"},
+        {"role": "Scientist 1", "gender": "F"},
+        {"role": "Scientist 2", "gender": "M"},
+        {"role": "Medical Officer", "gender": "F"}
+      ]
+    }
   }
 }

@@ -26,6 +26,10 @@ export default class SceneManager {
 
     // Scene objects
     this.objects = [];
+
+    // Update callback and timing
+    this.updateCallback = null;
+    this.lastTime = 0;
   }
 
   /**
@@ -161,14 +165,31 @@ export default class SceneManager {
   /**
    * Animation loop
    */
-  animate() {
-    this.animationId = requestAnimationFrame(() => this.animate());
+  animate(currentTime = 0) {
+    this.animationId = requestAnimationFrame((time) => this.animate(time));
+
+    // Calculate delta time (in seconds)
+    const deltaTime = this.lastTime === 0 ? 0 : (currentTime - this.lastTime) / 1000;
+    this.lastTime = currentTime;
+
+    // Call update callback if provided
+    if (this.updateCallback && typeof this.updateCallback === 'function') {
+      this.updateCallback(deltaTime);
+    }
 
     // Update controls (needed for damping)
     this.controls.update();
 
     // Render scene
     this.renderer.render(this.scene, this.camera);
+  }
+
+  /**
+   * Set update callback for custom logic each frame
+   * @param {Function} callback - Callback function(deltaTime)
+   */
+  setUpdateCallback(callback) {
+    this.updateCallback = callback;
   }
 
   /**

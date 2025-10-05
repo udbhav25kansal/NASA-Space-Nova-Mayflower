@@ -347,6 +347,80 @@
       border-radius: 6px;
     }
 
+    /* Mission Config & Metrics Styles */
+    .config-row, .metric-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 6px 0;
+      gap: 10px;
+    }
+
+    .config-row label, .metric-row span {
+      font-size: 12px;
+      color: #0f172a;
+      font-weight: 600;
+    }
+
+    .input-control {
+      flex: 1;
+      padding: 6px 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 12px;
+      background: white;
+      color: #0f172a;
+      font-family: inherit;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .input-control:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      background: linear-gradient(to right, #cbd5e1, #94a3b8);
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      background: linear-gradient(to bottom, #3b82f6, #1d4ed8);
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s ease;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.1);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      background: linear-gradient(to bottom, #3b82f6, #1d4ed8);
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s ease;
+    }
+
+    input[type="range"]::-moz-range-thumb:hover {
+      transform: scale(1.1);
+    }
+
     /* Errors */
     #errors {
       margin-top: 18px;
@@ -628,12 +702,127 @@
           Import JSON
           <input id="importFile" type="file" accept=".json" style="display:none" />
         </label>
+        <button class="btn outline" id="tileVizBtn">🔲 Show Tiles</button>
       </div>
 
       <!-- Module Catalog -->
       <div id="catalogSection">
         <h3>Module Catalog</h3>
         <div id="catalog"></div>
+      </div>
+
+      <!-- Mission Configuration Panel -->
+      <div id="missionConfigSection" style="margin-top: 18px;">
+        <h3 style="font-size: 11px; font-weight: 700; margin-bottom: 10px; color: #0f172a; text-transform: uppercase; letter-spacing: 0.05em;">🚀 Mission Configuration</h3>
+        <div style="padding: 14px 16px; background: linear-gradient(135deg, #ffffff 0%, #fef3c7 100%); border: 1px solid #cbd5e1; border-radius: 10px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);">
+
+          <div class="config-row">
+            <label>Crew Size:</label>
+            <select id="crewSize" class="input-control">
+              <option value="2">2 crew</option>
+              <option value="4" selected>4 crew (HERA)</option>
+              <option value="6">6 crew</option>
+            </select>
+          </div>
+
+          <div class="config-row">
+            <label>Mission Days:</label>
+            <select id="missionDays" class="input-control">
+              <option value="30">30 days</option>
+              <option value="45" selected>45 days (HERA)</option>
+              <option value="60">60 days</option>
+            </select>
+          </div>
+
+          <div class="config-row">
+            <label>Window Type:</label>
+            <select id="windowType" class="input-control">
+              <option value="0">None</option>
+              <option value="0.5" selected>Digital (virtual)</option>
+              <option value="1">Physical</option>
+            </select>
+          </div>
+
+          <div class="config-row">
+            <label>Circulation:</label>
+            <select id="circulationPattern" class="input-control">
+              <option value="0">Tree / Dead-end</option>
+              <option value="1" selected>Loop</option>
+            </select>
+          </div>
+
+          <div class="config-row" style="flex-direction: column; gap: 4px; margin-top: 8px;">
+            <div style="display: flex; justify-content: space-between; width: 100%;">
+              <label style="font-size: 12px;">Lighting Compliance:</label>
+              <span id="lightingComplianceVal" style="font-size: 11px; color: #64748b; font-weight: 600;">80%</span>
+            </div>
+            <input id="lightingCompliance" type="range" min="0" max="1" step="0.05" value="0.8" style="width: 100%;" />
+          </div>
+
+          <div class="config-row" style="flex-direction: column; gap: 4px; margin-top: 8px;">
+            <div style="display: flex; justify-content: space-between; width: 100%;">
+              <label style="font-size: 12px;">Exercise Compliance:</label>
+              <span id="exerciseComplianceVal" style="font-size: 11px; color: #64748b; font-weight: 600;">70%</span>
+            </div>
+            <input id="exerciseCompliance" type="range" min="0" max="1" step="0.05" value="0.7" style="width: 100%;" />
+          </div>
+
+          <div style="margin-top: 12px; height: 1px; background: #e2e8f0;"></div>
+
+          <div class="config-row" style="flex-direction: column; gap: 4px; margin-top: 12px;">
+            <div style="display: flex; justify-content: space-between; width: 100%;">
+              <label style="font-size: 12px;">Current Mission Day:</label>
+              <span id="currentDayVal" style="font-size: 11px; color: #64748b; font-weight: 600;">Day 15</span>
+            </div>
+            <input id="currentDay" type="range" min="1" max="45" value="15" style="width: 100%;" />
+          </div>
+
+          <button class="btn" id="runSimulationBtn" style="margin-top: 12px; width: 100%; font-size: 13px;">
+            Run 45-Day Simulation
+          </button>
+        </div>
+      </div>
+
+      <!-- Psychological Metrics Panel -->
+      <div id="psychMetricsSection" style="margin-top: 18px;">
+        <h3 style="font-size: 11px; font-weight: 700; margin-bottom: 10px; color: #0f172a; text-transform: uppercase; letter-spacing: 0.05em;">🧠 Psychological Metrics</h3>
+        <div style="padding: 14px 16px; background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%); border: 1px solid #cbd5e1; border-radius: 10px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);">
+
+          <div class="metric-row" style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #e2e8f0;">
+            <span style="font-size: 13px; font-weight: 600; color: #0f172a;">Psych Health Index:</span>
+            <strong id="phi" style="font-size: 22px; color: #059669; font-weight: 700;">—</strong>
+          </div>
+
+          <div class="metric-row">
+            <span style="font-size: 12px; color: #64748b;">Stress:</span>
+            <strong id="stressVal" style="font-size: 14px; color: #64748b; min-width: 45px; text-align: right;">—</strong>
+          </div>
+
+          <div class="metric-row">
+            <span style="font-size: 12px; color: #64748b;">Mood:</span>
+            <strong id="moodVal" style="font-size: 14px; color: #64748b; min-width: 45px; text-align: right;">—</strong>
+          </div>
+
+          <div class="metric-row">
+            <span style="font-size: 12px; color: #64748b;">Sleep Quality:</span>
+            <strong id="sleepQualityVal" style="font-size: 14px; color: #64748b; min-width: 45px; text-align: right;">—</strong>
+          </div>
+
+          <div class="metric-row">
+            <span style="font-size: 12px; color: #64748b;">Team Cohesion:</span>
+            <strong id="cohesionVal" style="font-size: 14px; color: #64748b; min-width: 45px; text-align: right;">—</strong>
+          </div>
+
+          <div style="margin-top: 12px; height: 1px; background: #e2e8f0;"></div>
+
+          <button class="btn secondary" id="exportCsvBtn" style="margin-top: 12px; width: 100%; font-size: 13px;">
+            Export Metrics CSV
+          </button>
+
+          <button class="btn secondary" id="heatmapToggle" style="margin-top: 8px; width: 100%; font-size: 13px;">
+            Toggle Stress Heatmap
+          </button>
+        </div>
       </div>
 
       <!-- Errors -->

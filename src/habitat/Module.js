@@ -18,9 +18,10 @@
  */
 
 import * as THREE from 'three';
+import Door from './Door.js';
 
 export default class HabitatModule extends THREE.Group {
-  constructor(catalogItem, id, constraints) {
+  constructor(catalogItem, id, constraints, tileSystem = null) {
     super();
 
     // Module properties from catalog
@@ -45,6 +46,24 @@ export default class HabitatModule extends THREE.Group {
 
     // Store constraints reference
     this.constraints = constraints;
+
+    // Tile-based positioning (CorsixTH integration)
+    this.tileSystem = tileSystem;
+    this.tileX = 0;
+    this.tileY = 0;
+
+    if (tileSystem) {
+      this.tileWidth = Math.ceil(catalogItem.w / tileSystem.tileSize);
+      this.tileHeight = Math.ceil(catalogItem.d / tileSystem.tileSize);
+    } else {
+      this.tileWidth = Math.ceil(catalogItem.w);
+      this.tileHeight = Math.ceil(catalogItem.d);
+    }
+
+    // Interior objects and crew
+    this.objects = [];      // Equipment/furniture placed inside
+    this.crew = [];         // Crew members currently in this module
+    this.door = null;       // Door/airlock reference
 
     // Create visual representation
     this.createMesh();
@@ -786,6 +805,21 @@ export default class HabitatModule extends THREE.Group {
     this.dimensions.w = this.dimensions.d;
     this.dimensions.d = temp;
 
+    // Swap tile dimensions if tile system available
+    if (this.tileSystem) {
+      const tempTile = this.tileWidth;
+      this.tileWidth = this.tileHeight;
+      this.tileHeight = tempTile;
+
+      // Update tile occupancy
+      this.tileSystem.clearModuleOccupancy(this.moduleId);
+      this.tileSystem.markModuleOccupancy(
+        this.tileX, this.tileY,
+        this.tileWidth, this.tileHeight,
+        this.moduleId, this.zone
+      );
+    }
+
     // Update rotation angle
     this.rotationAngle = (this.rotationAngle + 90) % 360;
     this.rotation.y = THREE.MathUtils.degToRad(this.rotationAngle);
@@ -798,6 +832,9 @@ export default class HabitatModule extends THREE.Group {
     this.createMesh();
     this.createOutline();
     this.createLabel();
+
+    // Recreate door with new orientation
+    this.createDoor();
 
     // Restore selection state
     if (this.isSelected) {
@@ -878,9 +915,237 @@ export default class HabitatModule extends THREE.Group {
   }
 
   /**
+   * Place module at tile coordinates
+   * CorsixTH-inspired tile-based placement
+   *
+   * @param {number} tileX - Tile X coordinate
+   * @param {number} tileY - Tile Y coordinate
+   * @returns {boolean} True if placement successful
+   */
+  placeAtTile(tileX, tileY) {
+    if (!this.tileSystem) {
+      console.warn('Module has no tile system reference');
+      return false;
+    }
+
+    // Validate placement
+    if (!this.canPlaceAt(tileX, tileY)) {
+      console.warn(`Cannot place ${this.moduleName} at tile (${tileX}, ${tileY})`);
+      return false;
+    }
+
+    // Clear previous position if already placed
+    if (this.tileX !== 0 || this.tileY !== 0) {
+      this.tileSystem.clearModuleOccupancy(this.moduleId);
+    }
+
+    // Set new tile position
+    this.tileX = tileX;
+    this.tileY = tileY;
+
+    // Update Three.js world position
+    const worldPos = this.tileSystem.tileToWorld(tileX, tileY);
+    this.position.set(worldPos.x, this.dimensions.h / 2, worldPos.z);
+
+    // Mark tiles as occupied in tile system
+    this.tileSystem.markModuleOccupancy(
+      tileX, tileY,
+      this.tileWidth, this.tileHeight,
+      this.moduleId, this.zone
+    );
+
+    // Create/update door
+    this.createDoor();
+
+    return true;
+  }
+
+  /**
+   * Create or update door for this module
+   */
+  createDoor() {
+    if (!this.tileSystem) return;
+
+    // Remove existing door if any
+    if (this.door) {
+      this.tileSystem.clearDoorTile(this.door.tileX, this.door.tileY);
+      this.remove(this.door);
+      this.door.dispose();
+      this.door = null;
+    }
+
+    // Determine door position based on rotation
+    const doorInfo = this.getDoorPosition();
+
+    if (!doorInfo) {
+      console.warn(`Cannot determine door position for ${this.moduleName}`);
+      return;
+    }
+
+    // Create door
+    this.door = new Door(this, doorInfo.tileX, doorInfo.tileY, doorInfo.direction);
+
+    // Position door in 3D space
+    const doorWorldPos = this.tileSystem.tileToWorld(doorInfo.tileX, doorInfo.tileY);
+    this.door.position.set(
+      doorWorldPos.x - this.position.x,
+      0 - this.position.y + this.dimensions.h / 2,
+      doorWorldPos.z - this.position.z
+    );
+
+    // Mark tile as door in tile system
+    this.tileSystem.markDoorTile(doorInfo.tileX, doorInfo.tileY, this.moduleId);
+
+    // Add door to module
+    this.add(this.door);
+
+    console.log(`✅ Door created for ${this.moduleName} at tile (${doorInfo.tileX}, ${doorInfo.tileY}) facing ${doorInfo.direction}`);
+  }
+
+  /**
+   * Get door position based on module dimensions and rotation
+   * @returns {{tileX: number, tileY: number, direction: string}|null}
+   */
+  getDoorPosition() {
+    if (!this.tileSystem) return null;
+
+    let doorTileX = this.tileX;
+    let doorTileY = this.tileY;
+    let direction = 'south';
+
+    // Calculate door position based on rotation
+    // Door is always at the "front" (south side before rotation)
+    const centerX = Math.floor(this.tileWidth / 2);
+    const centerY = Math.floor(this.tileHeight / 2);
+
+    switch (this.rotationAngle) {
+      case 0: // South-facing
+        doorTileX = this.tileX + centerX;
+        doorTileY = this.tileY + this.tileHeight - 1;
+        direction = 'south';
+        break;
+      case 90: // West-facing
+        doorTileX = this.tileX;
+        doorTileY = this.tileY + centerY;
+        direction = 'west';
+        break;
+      case 180: // North-facing
+        doorTileX = this.tileX + centerX;
+        doorTileY = this.tileY;
+        direction = 'north';
+        break;
+      case 270: // East-facing
+        doorTileX = this.tileX + this.tileWidth - 1;
+        doorTileY = this.tileY + centerY;
+        direction = 'east';
+        break;
+    }
+
+    return { tileX: doorTileX, tileY: doorTileY, direction };
+  }
+
+  /**
+   * Check if module can be placed at given tile position
+   *
+   * @param {number} tileX - Tile X coordinate
+   * @param {number} tileY - Tile Y coordinate
+   * @returns {boolean} True if placement is valid
+   */
+  canPlaceAt(tileX, tileY) {
+    if (!this.tileSystem) return false;
+
+    // Check bounds
+    if (tileX < 0 || tileY < 0) return false;
+    if (tileX + this.tileWidth > this.tileSystem.width) return false;
+    if (tileY + this.tileHeight > this.tileSystem.height) return false;
+
+    // Check tile occupancy
+    for (let dy = 0; dy < this.tileHeight; dy++) {
+      for (let dx = 0; dx < this.tileWidth; dx++) {
+        const tile = this.tileSystem.getTile(tileX + dx, tileY + dy);
+        if (!tile) return false;
+
+        // Tile is occupied by a different module
+        if (tile.occupied && tile.moduleId !== this.moduleId) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Get all tiles occupied by this module
+   *
+   * @returns {Array<Object>} Array of tile objects
+   */
+  getOccupiedTiles() {
+    if (!this.tileSystem) return [];
+
+    return this.tileSystem.getTilesInRect(
+      this.tileX, this.tileY,
+      this.tileWidth, this.tileHeight
+    );
+  }
+
+  /**
+   * Get tile coordinates of module center
+   *
+   * @returns {{x: number, y: number}} Center tile position
+   */
+  getCenterTile() {
+    return {
+      x: this.tileX + Math.floor(this.tileWidth / 2),
+      y: this.tileY + Math.floor(this.tileHeight / 2)
+    };
+  }
+
+  /**
+   * Remove module from tile system
+   */
+  removeTileOccupancy() {
+    if (!this.tileSystem) return;
+    this.tileSystem.clearModuleOccupancy(this.moduleId);
+  }
+
+  /**
+   * Get module entrance tile (next to door)
+   * For crew pathfinding
+   *
+   * @param {boolean} inside - If true, get tile inside module; else outside
+   * @returns {{x: number, y: number}|null} Entrance tile coordinates
+   */
+  getEntranceTile(inside = false) {
+    if (!this.door) {
+      // Default to center front if no door
+      const centerX = this.tileX + Math.floor(this.tileWidth / 2);
+      const frontY = inside ? this.tileY : this.tileY - 1;
+      return { x: centerX, y: frontY };
+    }
+
+    // Use door position
+    if (inside) {
+      return this.door.getInsideTile();
+    } else {
+      return this.door.getOutsideTile();
+    }
+  }
+
+  /**
    * Dispose of module resources
    */
   dispose() {
+    // Clear tile occupancy
+    this.removeTileOccupancy();
+
+    // Dispose door
+    if (this.door && this.tileSystem) {
+      this.tileSystem.clearDoorTile(this.door.tileX, this.door.tileY);
+      this.door.dispose();
+      this.door = null;
+    }
+
     // Dispose mesh group and all children
     if (this.meshGroup) {
       this.meshGroup.traverse((object) => {

@@ -59,33 +59,36 @@ export default class GridSystem {
    * Create major and minor grid lines
    */
   createGrids() {
-    // Minor grid (0.1m spacing) - very light gray
-    const minorGrid = new THREE.GridHelper(
-      this.gridSize,           // size
-      this.minorDivisions,     // divisions
-      0xffffff,                // center line color (white)
-      0xf3f4f6                 // grid color (very light gray)
-    );
+    // Grid lines removed - caused gray vertical mesh visual issue
+    // Keeping only floor plate and border for clean visualization
 
-    // Rotate to lie on XZ plane (floor)
-    minorGrid.rotation.x = Math.PI / 2;
-    minorGrid.position.y = -0.01; // Slightly below to prevent z-fighting
+    // Minor grid (0.1m spacing) - DISABLED
+    // const minorGrid = new THREE.GridHelper(
+    //   this.gridSize,           // size
+    //   this.minorDivisions,     // divisions
+    //   0xffffff,                // center line color (white)
+    //   0xf3f4f6                 // grid color (very light gray)
+    // );
 
-    this.group.add(minorGrid);
+    // // Rotate to lie on XZ plane (floor)
+    // minorGrid.rotation.x = Math.PI / 2;
+    // minorGrid.position.y = -0.01; // Slightly below to prevent z-fighting
 
-    // Major grid (1m spacing) - darker gray
-    const majorGrid = new THREE.GridHelper(
-      this.gridSize,           // size
-      this.majorDivisions,     // divisions
-      0x9ca3af,                // center line color (medium gray)
-      0xe5e7eb                 // grid color (light gray)
-    );
+    // this.group.add(minorGrid);
 
-    // Rotate to lie on XZ plane (floor)
-    majorGrid.rotation.x = Math.PI / 2;
-    majorGrid.position.y = 0; // At floor level
+    // Major grid (1m spacing) - DISABLED
+    // const majorGrid = new THREE.GridHelper(
+    //   this.gridSize,           // size
+    //   this.majorDivisions,     // divisions
+    //   0x9ca3af,                // center line color (medium gray)
+    //   0xe5e7eb                 // grid color (light gray)
+    // );
 
-    this.group.add(majorGrid);
+    // // Rotate to lie on XZ plane (floor)
+    // majorGrid.rotation.x = Math.PI / 2;
+    // majorGrid.position.y = 0; // At floor level
+
+    // this.group.add(majorGrid);
   }
 
   /**

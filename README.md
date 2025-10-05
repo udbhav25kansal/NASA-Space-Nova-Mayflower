@@ -315,16 +315,77 @@ For questions, issues, or contributions:
 
 ---
 
-## 🔮 Future Enhancements (Phase 2)
+## 🧠 Phase 2: Psychological Simulation (IMPLEMENTED)
+
+Phase 2 adds a **complete psychological simulation engine** based on HERA facility data and the UND Lunar Daytime Behavioral Study.
+
+### Psychological Metrics
+
+**4 Core Metrics Tracked:**
+1. **Stress** (0-100, lower is better) - Based on privacy, adjacency, visual order
+2. **Mood** (0-100, higher is better) - Influenced by recreation, windows, exercise
+3. **Sleep Quality** (0-100, higher is better) - Affected by privacy, lighting, noise isolation
+4. **Team Cohesion** (0-100, higher is better) - Driven by common areas, visual order
+
+**Psychological Health Index (PHI):** Composite score averaging all 4 metrics (inverted stress)
+
+### Mission Simulation
+
+- ✅ **HERA-validated 45-day missions** with daily time-step simulation
+- ✅ **8 design variables** from UND study automatically computed from layout
+- ✅ **Autoregressive damping** (λ=0.7) for realistic day-to-day psychological trends
+- ✅ **Baseline isolation effects** from HERA analog data
+
+### Design Variables
+
+| Variable | Description | Impact |
+|----------|-------------|--------|
+| **P** - Private Sleep Quarters | Crew Quarters / Crew Size | ⬇️ Stress, ⬆️ Mood, ⬆️ Sleep |
+| **W** - Window Type | None / Digital / Physical | ⬇️ Stress, ⬆️ Mood |
+| **V** - Visual Order | Layout cleanliness (no overlaps) | ⬇️ Stress, ⬆️ Cohesion |
+| **L** - Lighting Compliance | Circadian rhythm adherence | ⬇️ Stress, ⬆️ Sleep |
+| **A** - Adjacency Compliance | NASA adjacency rules met | ⬇️ Stress, ⬆️ Sleep, ⬆️ Cohesion |
+| **R** - Recreation Area | Dining + Exercise / Total Area | ⬆️ Mood, ⬆️ Cohesion |
+| **E** - Exercise Compliance | Daily HERA schedule adherence | ⬆️ Mood, ⬆️ Sleep |
+| **C** - Circulation Pattern | Tree vs Loop configuration | Emergency response |
+
+### Usage
+
+1. **Configure Mission**: Set crew size (2/4/6), duration (30/45/60 days), window type, lighting/exercise compliance
+2. **Build Layout**: Add and arrange modules using Phase 1 tools
+3. **View Real-Time Metrics**: PHI and 4 psychological metrics update automatically
+4. **Run 45-Day Simulation**: Click "Run 45-Day Simulation" for complete mission analysis
+5. **Export CSV**: Download comprehensive metrics with 5 sections (layout, variables, daily metrics, statistics, NASA compliance)
+6. **Toggle Heatmap**: Visualize stress hotspots with color-coded module overlays
+
+### CSV Export Format
+
+- **Section 1**: Module layout (positions, rotations, dimensions)
+- **Section 2**: All 8 design variables with values and ranges
+- **Section 3**: NASA compliance summary
+- **Section 4**: Daily psychological metrics for all 45 days
+- **Section 5**: Statistical summary (mean, min, max, std dev, final values)
+
+### Additional NASA Data Sources (Phase 2)
+
+| Source | Application |
+|--------|-------------|
+| **HERA Facility 2019** | Mission parameters, baseline psychological trends (stress 40→65, mood 70→50) |
+| **UND LDT Study 2020** | Design variable weights (αP=10, αW=6, etc.) and behavioral correlations |
+| **NASA TP-2020-220505** | Psychological impact of volume allocations and adjacency |
+
+---
+
+## 🔮 Future Enhancements (Phase 3)
 
 Planned features for future development:
 
-- **Psychological Simulation**: HERA/UND stress modeling over mission duration
+- **Layout Comparison Mode**: Save and compare multiple designs side-by-side
 - **Multiple Habitat Shapes**: Cylindrical, inflatable, modular configurations
 - **ECLSS Integration**: Life support system overhead calculations
-- **Mission Scenarios**: Predefined lunar campaign templates
-- **Community Sharing**: Upload and compare layouts
-- **VR Walkthrough**: Immersive habitat exploration
+- **Mission Scenarios**: Predefined lunar campaign templates (Foundational/Sustained)
+- **Community Sharing**: Upload and compare layouts with leaderboard
+- **VR Walkthrough**: Immersive habitat exploration with psychological annotations
 
 ---
 
