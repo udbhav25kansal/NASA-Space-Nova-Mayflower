@@ -17,8 +17,16 @@
     "lunar",
     "simulator"
   ],
-  "author": "",
+  "author": "Habitat Harmony Team",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/habitat-harmony-ls2.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/habitat-harmony-ls2/issues"
+  },
+  "homepage": "https://github.com/yourusername/habitat-harmony-ls2#readme",
   "dependencies": {
     "three": "^0.180.0"
   },
