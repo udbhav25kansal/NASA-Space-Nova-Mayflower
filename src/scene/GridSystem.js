@@ -26,9 +26,11 @@ export default class GridSystem {
     this.group = new THREE.Group();
     this.group.name = 'GridSystem';
 
-    // Default habitat dimensions (meters)
+    // Default habitat dimensions (meters) - NASA hybrid TransHab reference
     this.habitatWidth = 12.0;   // X dimension
     this.habitatDepth = 8.0;    // Z dimension
+    this.habitatHeight = 3.0;   // Y dimension (single level default)
+    this.habitatLevels = 1;     // Number of levels
 
     // Grid dimensions
     this.gridSize = 40;         // Total grid size (40m × 40m)
@@ -198,12 +200,14 @@ export default class GridSystem {
 
   /**
    * Get habitat dimensions
-   * @returns {Object} {width, depth}
+   * @returns {Object} {width, depth, height, levels}
    */
   getHabitatDimensions() {
     return {
       width: this.habitatWidth,
-      depth: this.habitatDepth
+      depth: this.habitatDepth,
+      height: this.habitatHeight,
+      levels: this.habitatLevels
     };
   }
 
@@ -231,20 +235,25 @@ export default class GridSystem {
   }
 
   /**
-   * Update habitat dimensions
-   * @param {number} width - New width
-   * @param {number} depth - New depth
+   * Update habitat dimensions and configuration
+   * @param {Object} config - Habitat configuration
+   * @param {number} config.width - New width
+   * @param {number} config.depth - New depth
+   * @param {number} config.height - New height
+   * @param {number} config.levels - Number of levels
    */
-  updateHabitatSize(width, depth) {
-    this.habitatWidth = width;
-    this.habitatDepth = depth;
+  updateHabitatSize(config) {
+    this.habitatWidth = config.width;
+    this.habitatDepth = config.depth;
+    this.habitatHeight = config.height || 3.0;
+    this.habitatLevels = config.levels || 1;
 
     // Recreate grid system
     this.group.clear();
     this.createGrids();
     this.createFloorPlate();
 
-    console.log(`📐 Habitat dimensions updated: ${width}m × ${depth}m`);
+    console.log(`📐 Habitat dimensions updated: ${config.width}m × ${config.depth}m × ${this.habitatHeight}m (${this.habitatLevels} level${this.habitatLevels > 1 ? 's' : ''})`);
   }
 
   /**

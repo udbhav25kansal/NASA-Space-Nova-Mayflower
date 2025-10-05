@@ -32,32 +32,35 @@ class Door extends THREE.Group {
    * Create door visual representation
    */
   createVisual() {
-    // Simple door frame (for now - can be replaced with model later)
-    const frameGeometry = new THREE.BoxGeometry(0.1, 2.0, 1.0);
-    const frameMaterial = new THREE.MeshStandardMaterial({
-      color: 0x3b82f6,
-      metalness: 0.6,
-      roughness: 0.4
-    });
+    // Door visuals disabled - keeping door data structure for pathfinding and crew movement
+    // No visual geometry rendered to keep scene clean
 
-    // Left frame
-    const leftFrame = new THREE.Mesh(frameGeometry, frameMaterial);
-    leftFrame.position.set(-0.45, 1.0, 0);
-    this.add(leftFrame);
+    // Simple door frame (DISABLED - was causing blue visual artifacts)
+    // const frameGeometry = new THREE.BoxGeometry(0.1, 2.0, 1.0);
+    // const frameMaterial = new THREE.MeshStandardMaterial({
+    //   color: 0x3b82f6,
+    //   metalness: 0.6,
+    //   roughness: 0.4
+    // });
 
-    // Right frame
-    const rightFrame = new THREE.Mesh(frameGeometry, frameMaterial);
-    rightFrame.position.set(0.45, 1.0, 0);
-    this.add(rightFrame);
+    // // Left frame
+    // const leftFrame = new THREE.Mesh(frameGeometry, frameMaterial);
+    // leftFrame.position.set(-0.45, 1.0, 0);
+    // this.add(leftFrame);
 
-    // Top frame
-    const topGeometry = new THREE.BoxGeometry(1.0, 0.1, 1.0);
-    const topFrame = new THREE.Mesh(topGeometry, frameMaterial);
-    topFrame.position.set(0, 2.0, 0);
-    this.add(topFrame);
+    // // Right frame
+    // const rightFrame = new THREE.Mesh(frameGeometry, frameMaterial);
+    // rightFrame.position.set(0.45, 1.0, 0);
+    // this.add(rightFrame);
 
-    // Rotate door frame based on direction
-    this.setRotationFromDirection();
+    // // Top frame
+    // const topGeometry = new THREE.BoxGeometry(1.0, 0.1, 1.0);
+    // const topFrame = new THREE.Mesh(topGeometry, frameMaterial);
+    // topFrame.position.set(0, 2.0, 0);
+    // this.add(topFrame);
+
+    // // Rotate door frame based on direction
+    // this.setRotationFromDirection();
   }
 
   /**

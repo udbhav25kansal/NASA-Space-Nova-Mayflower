@@ -129,6 +129,30 @@ export default class HabitatModule extends THREE.Group {
       case 'Workstation':
         this.createWorkstationMesh(this.meshGroup, baseMaterial, accentMaterial);
         break;
+      case 'Medical':
+        this.createMedicalMesh(this.meshGroup, baseMaterial, accentMaterial);
+        break;
+      case 'EVA Prep':
+        this.createEVAPrepMesh(this.meshGroup, baseMaterial, accentMaterial);
+        break;
+      case 'Airlock':
+        this.createAirlockMesh(this.meshGroup, baseMaterial, accentMaterial);
+        break;
+      case 'Stowage':
+        this.createStowageMesh(this.meshGroup, baseMaterial, accentMaterial);
+        break;
+      case 'Window Station':
+        this.createWindowStationMesh(this.meshGroup, baseMaterial, accentMaterial);
+        break;
+      case 'Laboratory':
+        this.createLaboratoryMesh(this.meshGroup, baseMaterial, accentMaterial);
+        break;
+      case 'Communications':
+        this.createCommunicationsMesh(this.meshGroup, baseMaterial, accentMaterial);
+        break;
+      case 'IFM/Repair':
+        this.createIFMRepairMesh(this.meshGroup, baseMaterial, accentMaterial);
+        break;
       default:
         // Fallback to basic box
         this.createBasicMesh(this.meshGroup, baseMaterial);
@@ -646,6 +670,566 @@ export default class HabitatModule extends THREE.Group {
       baseMat
     );
     group.add(box);
+  }
+
+  /**
+   * Medical Module: Medical bed + equipment cabinet + vital signs monitor
+   */
+  createMedicalMesh(group, baseMat, accentMat) {
+    const { w, h, d } = this.dimensions;
+
+    // Medical bed frame
+    const bedFrameGeo = new THREE.BoxGeometry(w * 0.4, h * 0.08, d * 0.6);
+    const bedFrame = new THREE.Mesh(bedFrameGeo, new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.6 }));
+    bedFrame.position.set(-w * 0.2, -h/2 + h * 0.04, 0);
+    group.add(bedFrame);
+
+    // Mattress
+    const mattressGeo = new THREE.BoxGeometry(w * 0.38, h * 0.06, d * 0.58);
+    const mattress = new THREE.Mesh(mattressGeo, new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9 }));
+    mattress.position.set(-w * 0.2, -h/2 + h * 0.11, 0);
+    group.add(mattress);
+
+    // Medical equipment cabinet
+    const cabinetGeo = new THREE.BoxGeometry(w * 0.25, h * 0.5, d * 0.3);
+    const cabinet = new THREE.Mesh(cabinetGeo, new THREE.MeshStandardMaterial({ color: 0xe8e8e8, metalness: 0.3 }));
+    cabinet.position.set(w * 0.25, -h/2 + h * 0.25, d * 0.25);
+    group.add(cabinet);
+
+    // Red cross symbol on cabinet
+    const crossV = new THREE.Mesh(
+      new THREE.BoxGeometry(w * 0.04, h * 0.15, d * 0.02),
+      new THREE.MeshStandardMaterial({ color: 0xff0000 })
+    );
+    crossV.position.set(w * 0.37, -h/2 + h * 0.25, d * 0.25);
+    group.add(crossV);
+
+    const crossH = new THREE.Mesh(
+      new THREE.BoxGeometry(w * 0.12, h * 0.05, d * 0.02),
+      new THREE.MeshStandardMaterial({ color: 0xff0000 })
+    );
+    crossH.position.set(w * 0.37, -h/2 + h * 0.25, d * 0.25);
+    group.add(crossH);
+
+    // Vital signs monitor
+    const monitorGeo = new THREE.BoxGeometry(w * 0.15, h * 0.12, d * 0.03);
+    const monitor = new THREE.Mesh(monitorGeo, new THREE.MeshStandardMaterial({
+      color: 0x1a1a1a,
+      emissive: 0x00ff00,
+      emissiveIntensity: 0.3
+    }));
+    monitor.position.set(w * 0.25, -h/2 + h * 0.55, -d * 0.2);
+    group.add(monitor);
+
+    // Monitor stand
+    const standGeo = new THREE.CylinderGeometry(w * 0.02, w * 0.02, h * 0.3);
+    const stand = new THREE.Mesh(standGeo, new THREE.MeshStandardMaterial({ color: 0x444444, metalness: 0.7 }));
+    stand.position.set(w * 0.25, -h/2 + h * 0.35, -d * 0.2);
+    group.add(stand);
+  }
+
+  /**
+   * EVA Prep Module: Spacesuit rack + helmet storage + tools
+   */
+  createEVAPrepMesh(group, baseMat, accentMat) {
+    const { w, h, d } = this.dimensions;
+
+    // Spacesuit rack (vertical pole)
+    const rackGeo = new THREE.CylinderGeometry(w * 0.03, w * 0.03, h * 0.7);
+    const rack = new THREE.Mesh(rackGeo, new THREE.MeshStandardMaterial({ color: 0x555555, metalness: 0.8 }));
+    rack.position.set(-w * 0.3, -h/2 + h * 0.35, 0);
+    group.add(rack);
+
+    // Spacesuit torso (upper body)
+    const torsoGeo = new THREE.BoxGeometry(w * 0.25, h * 0.35, d * 0.2);
+    const torso = new THREE.Mesh(torsoGeo, new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 }));
+    torso.position.set(-w * 0.3, -h/2 + h * 0.5, 0);
+    group.add(torso);
+
+    // Helmet on shelf
+    const helmetGeo = new THREE.SphereGeometry(w * 0.08, 16, 16);
+    const helmet = new THREE.Mesh(helmetGeo, new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.7,
+      metalness: 0.5
+    }));
+    helmet.position.set(w * 0.25, -h/2 + h * 0.6, d * 0.2);
+    group.add(helmet);
+
+    // Helmet shelf
+    const shelfGeo = new THREE.BoxGeometry(w * 0.3, h * 0.02, d * 0.25);
+    const shelf = new THREE.Mesh(shelfGeo, new THREE.MeshStandardMaterial({ color: 0x888888 }));
+    shelf.position.set(w * 0.25, -h/2 + h * 0.52, d * 0.2);
+    group.add(shelf);
+
+    // Tool cabinet
+    const toolBoxGeo = new THREE.BoxGeometry(w * 0.2, h * 0.25, d * 0.2);
+    const toolBox = new THREE.Mesh(toolBoxGeo, new THREE.MeshStandardMaterial({ color: 0xff6600, metalness: 0.4 }));
+    toolBox.position.set(w * 0.25, -h/2 + h * 0.15, -d * 0.25);
+    group.add(toolBox);
+
+    // Glove storage hooks
+    for (let i = 0; i < 3; i++) {
+      const hookGeo = new THREE.CylinderGeometry(w * 0.01, w * 0.01, d * 0.08);
+      const hook = new THREE.Mesh(hookGeo, new THREE.MeshStandardMaterial({ color: 0x333333, metalness: 0.9 }));
+      hook.rotation.x = Math.PI / 2;
+      hook.position.set(w * 0.1 * i - w * 0.1, -h/2 + h * 0.35, -d * 0.4);
+      group.add(hook);
+    }
+  }
+
+  /**
+   * Airlock Module: Circular hatch + pressure gauges + control panel
+   */
+  createAirlockMesh(group, baseMat, accentMat) {
+    const { w, h, d } = this.dimensions;
+
+    // Circular hatch door
+    const hatchGeo = new THREE.CylinderGeometry(w * 0.35, w * 0.35, d * 0.08, 32);
+    const hatch = new THREE.Mesh(hatchGeo, new THREE.MeshStandardMaterial({ color: 0x4a4a4a, metalness: 0.9, roughness: 0.2 }));
+    hatch.rotation.x = Math.PI / 2;
+    hatch.position.set(0, 0, -d * 0.35);
+    group.add(hatch);
+
+    // Hatch wheel (outer ring)
+    const wheelGeo = new THREE.TorusGeometry(w * 0.25, w * 0.03, 16, 32);
+    const wheel = new THREE.Mesh(wheelGeo, new THREE.MeshStandardMaterial({ color: 0xffcc00, metalness: 0.8 }));
+    wheel.rotation.x = Math.PI / 2;
+    wheel.position.set(0, 0, -d * 0.3);
+    group.add(wheel);
+
+    // Wheel spokes
+    for (let i = 0; i < 6; i++) {
+      const spokeGeo = new THREE.BoxGeometry(w * 0.03, d * 0.02, w * 0.25);
+      const spoke = new THREE.Mesh(spokeGeo, new THREE.MeshStandardMaterial({ color: 0xffcc00, metalness: 0.8 }));
+      spoke.rotation.y = (Math.PI / 3) * i;
+      spoke.position.set(0, 0, -d * 0.3);
+      group.add(spoke);
+    }
+
+    // Pressure gauge panel (left side)
+    const panelGeo = new THREE.BoxGeometry(w * 0.15, h * 0.2, d * 0.05);
+    const panel = new THREE.Mesh(panelGeo, new THREE.MeshStandardMaterial({ color: 0x2a2a2a }));
+    panel.position.set(-w * 0.35, -h/2 + h * 0.5, d * 0.3);
+    group.add(panel);
+
+    // Pressure gauges (3 circular dials)
+    for (let i = 0; i < 3; i++) {
+      const gaugeGeo = new THREE.CylinderGeometry(w * 0.04, w * 0.04, d * 0.02, 32);
+      const gauge = new THREE.Mesh(gaugeGeo, new THREE.MeshStandardMaterial({
+        color: 0x00ff00,
+        emissive: 0x00ff00,
+        emissiveIntensity: 0.4
+      }));
+      gauge.rotation.x = Math.PI / 2;
+      gauge.position.set(-w * 0.35, -h/2 + h * 0.35 + i * h * 0.15, d * 0.33);
+      group.add(gauge);
+    }
+
+    // Warning stripes on floor
+    for (let i = 0; i < 4; i++) {
+      const stripeGeo = new THREE.BoxGeometry(w * 0.1, h * 0.01, d * 0.8);
+      const stripe = new THREE.Mesh(stripeGeo, new THREE.MeshStandardMaterial({ color: i % 2 === 0 ? 0xffff00 : 0x000000 }));
+      stripe.position.set(-w * 0.4 + i * w * 0.12, -h/2 + h * 0.01, 0);
+      group.add(stripe);
+    }
+  }
+
+  /**
+   * Stowage Module: Shelving racks + storage bags + labeled containers
+   */
+  createStowageMesh(group, baseMat, accentMat) {
+    const { w, h, d } = this.dimensions;
+
+    // Storage rack frame (left side)
+    const rackFrameGeo = new THREE.BoxGeometry(w * 0.35, h * 0.8, d * 0.05);
+    const rackFrame = new THREE.Mesh(rackFrameGeo, new THREE.MeshStandardMaterial({ color: 0x666666, metalness: 0.6 }));
+    rackFrame.position.set(-w * 0.25, -h/2 + h * 0.4, d * 0.35);
+    group.add(rackFrame);
+
+    // Shelves (4 horizontal shelves)
+    for (let i = 0; i < 4; i++) {
+      const shelfGeo = new THREE.BoxGeometry(w * 0.35, h * 0.02, d * 0.3);
+      const shelf = new THREE.Mesh(shelfGeo, new THREE.MeshStandardMaterial({ color: 0x888888 }));
+      shelf.position.set(-w * 0.25, -h/2 + h * 0.15 + i * h * 0.2, d * 0.2);
+      group.add(shelf);
+
+      // Storage containers on shelves
+      for (let j = 0; j < 2; j++) {
+        const containerGeo = new THREE.BoxGeometry(w * 0.12, h * 0.08, d * 0.12);
+        const container = new THREE.Mesh(containerGeo, new THREE.MeshStandardMaterial({
+          color: [0x3366cc, 0x66cc33, 0xcc6633, 0xcc33cc][i],
+          roughness: 0.6
+        }));
+        container.position.set(-w * 0.35 + j * w * 0.2, -h/2 + h * 0.19 + i * h * 0.2, d * 0.2);
+        group.add(container);
+      }
+    }
+
+    // Storage bags (right side - soft goods)
+    for (let i = 0; i < 3; i++) {
+      const bagGeo = new THREE.SphereGeometry(w * 0.08, 8, 8);
+      bagGeo.scale(1, 0.7, 1.2); // Squash to look like bags
+      const bag = new THREE.Mesh(bagGeo, new THREE.MeshStandardMaterial({
+        color: 0xeeeeee,
+        roughness: 0.8
+      }));
+      bag.position.set(w * 0.25, -h/2 + h * 0.25 + i * h * 0.2, -d * 0.2);
+      group.add(bag);
+    }
+
+    // Cargo net
+    const netGeo = new THREE.PlaneGeometry(w * 0.3, h * 0.6);
+    const net = new THREE.Mesh(netGeo, new THREE.MeshStandardMaterial({
+      color: 0x00ff00,
+      transparent: true,
+      opacity: 0.3,
+      wireframe: true
+    }));
+    net.position.set(w * 0.25, -h/2 + h * 0.4, -d * 0.15);
+    group.add(net);
+  }
+
+  /**
+   * Window Station Module: Window frame + observation chair + camera/telescope
+   */
+  createWindowStationMesh(group, baseMat, accentMat) {
+    const { w, h, d } = this.dimensions;
+
+    // Window frame (outer bezel)
+    const frameGeo = new THREE.BoxGeometry(w * 0.5, h * 0.4, d * 0.05);
+    const frame = new THREE.Mesh(frameGeo, new THREE.MeshStandardMaterial({ color: 0x333333, metalness: 0.7 }));
+    frame.position.set(0, -h/2 + h * 0.5, -d * 0.4);
+    group.add(frame);
+
+    // Window glass (transparent with blue tint)
+    const glassGeo = new THREE.BoxGeometry(w * 0.45, h * 0.35, d * 0.02);
+    const glass = new THREE.Mesh(glassGeo, new THREE.MeshStandardMaterial({
+      color: 0x88ccff,
+      transparent: true,
+      opacity: 0.4,
+      metalness: 0.9,
+      roughness: 0.1
+    }));
+    glass.position.set(0, -h/2 + h * 0.5, -d * 0.38);
+    group.add(glass);
+
+    // Stars visible through window (small emissive dots)
+    for (let i = 0; i < 8; i++) {
+      const starGeo = new THREE.SphereGeometry(w * 0.01, 8, 8);
+      const star = new THREE.Mesh(starGeo, new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        emissive: 0xffffff,
+        emissiveIntensity: 0.8
+      }));
+      star.position.set(
+        (Math.random() - 0.5) * w * 0.4,
+        -h/2 + h * 0.4 + Math.random() * h * 0.3,
+        -d * 0.37
+      );
+      group.add(star);
+    }
+
+    // Observation chair
+    const seatGeo = new THREE.BoxGeometry(w * 0.2, h * 0.05, d * 0.2);
+    const seat = new THREE.Mesh(seatGeo, new THREE.MeshStandardMaterial({ color: 0x1a1a1a }));
+    seat.position.set(0, -h/2 + h * 0.25, 0);
+    group.add(seat);
+
+    const backrestGeo = new THREE.BoxGeometry(w * 0.2, h * 0.2, d * 0.05);
+    const backrest = new THREE.Mesh(backrestGeo, new THREE.MeshStandardMaterial({ color: 0x1a1a1a }));
+    backrest.position.set(0, -h/2 + h * 0.35, d * 0.075);
+    group.add(backrest);
+
+    // Camera/telescope on tripod
+    const tripodGeo = new THREE.CylinderGeometry(w * 0.01, w * 0.02, h * 0.3);
+    const tripod = new THREE.Mesh(tripodGeo, new THREE.MeshStandardMaterial({ color: 0x444444, metalness: 0.8 }));
+    tripod.position.set(w * 0.3, -h/2 + h * 0.15, d * 0.2);
+    group.add(tripod);
+
+    const cameraGeo = new THREE.CylinderGeometry(w * 0.04, w * 0.04, w * 0.15);
+    const camera = new THREE.Mesh(cameraGeo, new THREE.MeshStandardMaterial({ color: 0x222222, metalness: 0.6 }));
+    camera.rotation.z = Math.PI / 4;
+    camera.position.set(w * 0.3, -h/2 + h * 0.35, d * 0.2);
+    group.add(camera);
+
+    // Lens (emissive blue)
+    const lensGeo = new THREE.CylinderGeometry(w * 0.03, w * 0.03, w * 0.02);
+    const lens = new THREE.Mesh(lensGeo, new THREE.MeshStandardMaterial({
+      color: 0x0066ff,
+      emissive: 0x0066ff,
+      emissiveIntensity: 0.5
+    }));
+    lens.rotation.z = Math.PI / 4;
+    lens.position.set(w * 0.3 + w * 0.08, -h/2 + h * 0.35 + w * 0.08, d * 0.2);
+    group.add(lens);
+  }
+
+  /**
+   * Laboratory Module: Microscope + sample containers + analysis equipment
+   */
+  createLaboratoryMesh(group, baseMat, accentMat) {
+    const { w, h, d } = this.dimensions;
+
+    // Lab bench/counter
+    const benchGeo = new THREE.BoxGeometry(w * 0.7, h * 0.05, d * 0.4);
+    const bench = new THREE.Mesh(benchGeo, new THREE.MeshStandardMaterial({ color: 0xdddddd, metalness: 0.3 }));
+    bench.position.set(0, -h/2 + h * 0.35, 0);
+    group.add(bench);
+
+    // Microscope base
+    const microBaseGeo = new THREE.CylinderGeometry(w * 0.06, w * 0.08, h * 0.08);
+    const microBase = new THREE.Mesh(microBaseGeo, new THREE.MeshStandardMaterial({ color: 0x2a2a2a, metalness: 0.7 }));
+    microBase.position.set(-w * 0.2, -h/2 + h * 0.42, 0);
+    group.add(microBase);
+
+    // Microscope arm
+    const armGeo = new THREE.CylinderGeometry(w * 0.015, w * 0.015, h * 0.25);
+    const arm = new THREE.Mesh(armGeo, new THREE.MeshStandardMaterial({ color: 0x333333, metalness: 0.8 }));
+    arm.position.set(-w * 0.2, -h/2 + h * 0.58, 0);
+    group.add(arm);
+
+    // Microscope eyepiece
+    const eyepieceGeo = new THREE.CylinderGeometry(w * 0.025, w * 0.025, h * 0.08);
+    const eyepiece = new THREE.Mesh(eyepieceGeo, new THREE.MeshStandardMaterial({ color: 0x1a1a1a, metalness: 0.6 }));
+    eyepiece.rotation.x = Math.PI / 6;
+    eyepiece.position.set(-w * 0.2, -h/2 + h * 0.72, -d * 0.05);
+    group.add(eyepiece);
+
+    // Sample containers (petri dishes)
+    for (let i = 0; i < 4; i++) {
+      const dishGeo = new THREE.CylinderGeometry(w * 0.04, w * 0.04, h * 0.01, 32);
+      const dish = new THREE.Mesh(dishGeo, new THREE.MeshStandardMaterial({
+        color: 0xaaffaa,
+        transparent: true,
+        opacity: 0.6
+      }));
+      dish.position.set(w * 0.1 + (i % 2) * w * 0.12, -h/2 + h * 0.38, -d * 0.1 + Math.floor(i / 2) * d * 0.15);
+      group.add(dish);
+    }
+
+    // Sample storage freezer
+    const freezerGeo = new THREE.BoxGeometry(w * 0.25, h * 0.3, d * 0.25);
+    const freezer = new THREE.Mesh(freezerGeo, new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.5 }));
+    freezer.position.set(w * 0.25, -h/2 + h * 0.5, d * 0.15);
+    group.add(freezer);
+
+    // Freezer display (blue emissive)
+    const displayGeo = new THREE.BoxGeometry(w * 0.1, h * 0.05, d * 0.01);
+    const display = new THREE.Mesh(displayGeo, new THREE.MeshStandardMaterial({
+      color: 0x0088ff,
+      emissive: 0x0088ff,
+      emissiveIntensity: 0.4
+    }));
+    display.position.set(w * 0.25, -h/2 + h * 0.62, d * 0.28);
+    group.add(display);
+
+    // Test tubes in rack
+    for (let i = 0; i < 6; i++) {
+      const tubeGeo = new THREE.CylinderGeometry(w * 0.008, w * 0.008, h * 0.08);
+      const tube = new THREE.Mesh(tubeGeo, new THREE.MeshStandardMaterial({
+        color: [0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0xff00ff, 0x00ffff][i],
+        transparent: true,
+        opacity: 0.7
+      }));
+      tube.position.set(-w * 0.05 + (i % 3) * w * 0.05, -h/2 + h * 0.42, d * 0.15 + Math.floor(i / 3) * d * 0.08);
+      group.add(tube);
+    }
+  }
+
+  /**
+   * Communications Module: Telephone with wire + antenna dish + control panel with buttons
+   */
+  createCommunicationsMesh(group, baseMat, accentMat) {
+    const { w, h, d } = this.dimensions;
+
+    // Main communications console
+    const consoleGeo = new THREE.BoxGeometry(w * 0.4, h * 0.5, d * 0.3);
+    const console = new THREE.Mesh(consoleGeo, new THREE.MeshStandardMaterial({ color: 0x2a2a2a, metalness: 0.6 }));
+    console.position.set(-w * 0.2, -h/2 + h * 0.25, 0);
+    group.add(console);
+
+    // Control panel screen (emissive green)
+    const screenGeo = new THREE.BoxGeometry(w * 0.3, h * 0.2, d * 0.02);
+    const screen = new THREE.Mesh(screenGeo, new THREE.MeshStandardMaterial({
+      color: 0x00ff00,
+      emissive: 0x00ff00,
+      emissiveIntensity: 0.5
+    }));
+    screen.position.set(-w * 0.2, -h/2 + h * 0.4, d * 0.16);
+    group.add(screen);
+
+    // Control buttons (grid of 6 buttons)
+    for (let i = 0; i < 6; i++) {
+      const buttonGeo = new THREE.CylinderGeometry(w * 0.02, w * 0.02, h * 0.02, 16);
+      const button = new THREE.Mesh(buttonGeo, new THREE.MeshStandardMaterial({
+        color: i === 0 ? 0xff0000 : 0x00ff00,
+        emissive: i === 0 ? 0xff0000 : 0x00ff00,
+        emissiveIntensity: 0.3
+      }));
+      button.rotation.x = Math.PI / 2;
+      button.position.set(
+        -w * 0.3 + (i % 3) * w * 0.1,
+        -h/2 + h * 0.2 - Math.floor(i / 3) * h * 0.08,
+        d * 0.16
+      );
+      group.add(button);
+    }
+
+    // Vintage telephone handset
+    const handsetBodyGeo = new THREE.CylinderGeometry(w * 0.025, w * 0.025, w * 0.15, 16);
+    const handsetBody = new THREE.Mesh(handsetBodyGeo, new THREE.MeshStandardMaterial({ color: 0x1a1a1a, metalness: 0.4 }));
+    handsetBody.rotation.z = Math.PI / 4;
+    handsetBody.position.set(w * 0.15, -h/2 + h * 0.35, -d * 0.15);
+    group.add(handsetBody);
+
+    // Telephone earpiece (sphere)
+    const earpieceGeo = new THREE.SphereGeometry(w * 0.04, 16, 16);
+    const earpiece = new THREE.Mesh(earpieceGeo, new THREE.MeshStandardMaterial({ color: 0x2a2a2a, metalness: 0.5 }));
+    earpiece.position.set(w * 0.22, -h/2 + h * 0.42, -d * 0.22);
+    group.add(earpiece);
+
+    // Telephone mouthpiece (sphere)
+    const mouthpieceGeo = new THREE.SphereGeometry(w * 0.04, 16, 16);
+    const mouthpiece = new THREE.Mesh(mouthpieceGeo, new THREE.MeshStandardMaterial({ color: 0x2a2a2a, metalness: 0.5 }));
+    mouthpiece.position.set(w * 0.08, -h/2 + h * 0.28, -d * 0.08);
+    group.add(mouthpiece);
+
+    // Curly telephone wire (spiral path)
+    const wireMaterial = new THREE.MeshStandardMaterial({ color: 0x333333, metalness: 0.6 });
+    const wireSegments = 20;
+    for (let i = 0; i < wireSegments; i++) {
+      const t = i / wireSegments;
+      const wireGeo = new THREE.CylinderGeometry(w * 0.005, w * 0.005, w * 0.015);
+      const wireSeg = new THREE.Mesh(wireGeo, wireMaterial);
+
+      // Spiral path from handset to console
+      const angle = t * Math.PI * 4; // 4 coils
+      const spiralRadius = w * 0.05;
+      wireSeg.position.set(
+        w * 0.08 + t * (w * 0.07) + Math.cos(angle) * spiralRadius,
+        -h/2 + h * 0.28 - t * h * 0.05,
+        -d * 0.08 + Math.sin(angle) * spiralRadius
+      );
+      wireSeg.rotation.z = angle;
+      group.add(wireSeg);
+    }
+
+    // Antenna dish (parabolic)
+    const dishGeo = new THREE.SphereGeometry(w * 0.2, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2);
+    const dish = new THREE.Mesh(dishGeo, new THREE.MeshStandardMaterial({
+      color: 0xcccccc,
+      metalness: 0.9,
+      roughness: 0.2,
+      side: THREE.DoubleSide
+    }));
+    dish.rotation.x = Math.PI;
+    dish.position.set(w * 0.25, -h/2 + h * 0.6, d * 0.2);
+    group.add(dish);
+
+    // Antenna feed (center point)
+    const feedGeo = new THREE.CylinderGeometry(w * 0.01, w * 0.01, h * 0.08);
+    const feed = new THREE.Mesh(feedGeo, new THREE.MeshStandardMaterial({ color: 0xffaa00, metalness: 0.8 }));
+    feed.position.set(w * 0.25, -h/2 + h * 0.64, d * 0.2);
+    group.add(feed);
+
+    // Antenna mount arm
+    const armGeo = new THREE.CylinderGeometry(w * 0.015, w * 0.015, h * 0.15);
+    const arm = new THREE.Mesh(armGeo, new THREE.MeshStandardMaterial({ color: 0x444444, metalness: 0.7 }));
+    arm.position.set(w * 0.25, -h/2 + h * 0.52, d * 0.2);
+    group.add(arm);
+  }
+
+  /**
+   * IFM/Repair Module: Tool bench + spare parts + diagnostic equipment
+   */
+  createIFMRepairMesh(group, baseMat, accentMat) {
+    const { w, h, d } = this.dimensions;
+
+    // Work bench
+    const benchGeo = new THREE.BoxGeometry(w * 0.6, h * 0.05, d * 0.4);
+    const bench = new THREE.Mesh(benchGeo, new THREE.MeshStandardMaterial({ color: 0x8b4513, roughness: 0.8 }));
+    bench.position.set(0, -h/2 + h * 0.3, 0);
+    group.add(bench);
+
+    // Tool pegboard (back wall)
+    const pegboardGeo = new THREE.BoxGeometry(w * 0.5, h * 0.5, d * 0.02);
+    const pegboard = new THREE.Mesh(pegboardGeo, new THREE.MeshStandardMaterial({ color: 0x654321, roughness: 0.9 }));
+    pegboard.position.set(0, -h/2 + h * 0.55, -d * 0.35);
+    group.add(pegboard);
+
+    // Tools hanging on pegboard (wrenches, screwdrivers)
+    const toolPositions = [
+      [-w*0.15, h*0.65, -d*0.34], [-w*0.05, h*0.65, -d*0.34], [w*0.05, h*0.65, -d*0.34], [w*0.15, h*0.65, -d*0.34],
+      [-w*0.15, h*0.5, -d*0.34], [-w*0.05, h*0.5, -d*0.34], [w*0.05, h*0.5, -d*0.34], [w*0.15, h*0.5, -d*0.34]
+    ];
+
+    toolPositions.forEach((pos, i) => {
+      const toolGeo = i % 2 === 0
+        ? new THREE.BoxGeometry(w * 0.03, h * 0.08, d * 0.01) // Wrench
+        : new THREE.CylinderGeometry(w * 0.005, w * 0.005, h * 0.08); // Screwdriver
+      const tool = new THREE.Mesh(toolGeo, new THREE.MeshStandardMaterial({
+        color: i % 2 === 0 ? 0x888888 : 0xff6600,
+        metalness: 0.8
+      }));
+      tool.position.set(pos[0], -h/2 + pos[1], pos[2]);
+      group.add(tool);
+    });
+
+    // Toolbox on bench (red)
+    const toolboxGeo = new THREE.BoxGeometry(w * 0.25, h * 0.12, d * 0.18);
+    const toolbox = new THREE.Mesh(toolboxGeo, new THREE.MeshStandardMaterial({ color: 0xcc0000, metalness: 0.4 }));
+    toolbox.position.set(-w * 0.2, -h/2 + h * 0.39, 0);
+    group.add(toolbox);
+
+    // Toolbox handle
+    const handleGeo = new THREE.TorusGeometry(w * 0.06, w * 0.008, 8, 16, Math.PI);
+    const handle = new THREE.Mesh(handleGeo, new THREE.MeshStandardMaterial({ color: 0x333333, metalness: 0.9 }));
+    handle.rotation.x = Math.PI / 2;
+    handle.position.set(-w * 0.2, -h/2 + h * 0.48, 0);
+    group.add(handle);
+
+    // Spare parts bins (stackable containers)
+    for (let i = 0; i < 3; i++) {
+      const binGeo = new THREE.BoxGeometry(w * 0.15, h * 0.08, d * 0.15);
+      const bin = new THREE.Mesh(binGeo, new THREE.MeshStandardMaterial({
+        color: [0x3366cc, 0x66cc33, 0xcccc33][i],
+        transparent: true,
+        opacity: 0.7
+      }));
+      bin.position.set(w * 0.25, -h/2 + h * 0.35 + i * h * 0.09, d * 0.15);
+      group.add(bin);
+    }
+
+    // Diagnostic tablet/device on bench
+    const tabletGeo = new THREE.BoxGeometry(w * 0.12, h * 0.01, d * 0.18);
+    const tablet = new THREE.Mesh(tabletGeo, new THREE.MeshStandardMaterial({
+      color: 0x1a1a1a,
+      emissive: 0x0066ff,
+      emissiveIntensity: 0.3
+    }));
+    tablet.rotation.x = -Math.PI / 6;
+    tablet.position.set(w * 0.1, -h/2 + h * 0.34, -d * 0.1);
+    group.add(tablet);
+
+    // Vise grip on bench edge
+    const viseBaseGeo = new THREE.BoxGeometry(w * 0.08, h * 0.06, d * 0.08);
+    const viseBase = new THREE.Mesh(viseBaseGeo, new THREE.MeshStandardMaterial({ color: 0x444444, metalness: 0.8 }));
+    viseBase.position.set(-w * 0.25, -h/2 + h * 0.3, -d * 0.15);
+    group.add(viseBase);
+
+    const viseJawGeo = new THREE.BoxGeometry(w * 0.02, h * 0.08, d * 0.08);
+    const viseJaw = new THREE.Mesh(viseJawGeo, new THREE.MeshStandardMaterial({ color: 0x666666, metalness: 0.9 }));
+    viseJaw.position.set(-w * 0.21, -h/2 + h * 0.34, -d * 0.15);
+    group.add(viseJaw);
+
+    // Wire spool
+    const spoolGeo = new THREE.CylinderGeometry(w * 0.04, w * 0.04, d * 0.06, 16);
+    const spool = new THREE.Mesh(spoolGeo, new THREE.MeshStandardMaterial({ color: 0xff6600 }));
+    spool.rotation.z = Math.PI / 2;
+    spool.position.set(w * 0.15, -h/2 + h * 0.35, -d * 0.15);
+    group.add(spool);
   }
 
   /**

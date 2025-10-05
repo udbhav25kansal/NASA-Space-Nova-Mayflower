@@ -28,16 +28,16 @@ export class MissionSimulator {
     this.missionDays = crewConfig.missionDays || 45;
     this.currentDay = 0;
 
-    // Initialize crew members
+    // Storage for daily metrics (must be before initializeCrew)
+    this.metrics = [];
+    this.sleepHistory = {}; // Track sleep history per crew member
+
+    // Initialize crew members (uses sleepHistory)
     this.crew = this.initializeCrew(crewConfig);
 
     // Initialize models
     this.psychModel = new PsychModel(psychParams);
     this.sleepModel = new SleepModel(constraints);
-
-    // Storage for daily metrics
-    this.metrics = [];
-    this.sleepHistory = {}; // Track sleep history per crew member
   }
 
   /**

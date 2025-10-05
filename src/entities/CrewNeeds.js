@@ -21,18 +21,18 @@
 
 class CrewNeeds {
   constructor() {
-    // Primary physiological needs
-    this.hunger = 0;         // 0-100 (satisfied by galley)
-    this.fatigue = 0;        // 0-100 (satisfied by sleep pod)
-    this.hygiene = 0;        // 0-100 (satisfied by hygiene module)
+    // Primary physiological needs - START HIGHER for immediate activity
+    this.hunger = 35;         // 0-100 (satisfied by galley) - was 0
+    this.fatigue = 25;        // 0-100 (satisfied by sleep pod) - was 0
+    this.hygiene = 20;        // 0-100 (satisfied by hygiene module) - was 0
 
-    // Psychological needs
-    this.stress = 40;        // 0-100 (reduced by recreation, increased by work)
-    this.socialNeed = 20;    // 0-100 (reduced by social interaction)
-    this.recreationNeed = 30; // 0-100 (reduced by recreation activities)
+    // Psychological needs - START HIGHER for immediate activity
+    this.stress = 45;         // 0-100 (reduced by recreation, increased by work) - was 40
+    this.socialNeed = 40;     // 0-100 (reduced by social interaction) - was 20
+    this.recreationNeed = 50; // 0-100 (reduced by recreation activities) - was 30
 
-    // Physical health needs
-    this.exerciseNeed = 20;  // 0-100 (reduced by exercise)
+    // Physical health needs - START HIGHER for immediate activity
+    this.exerciseNeed = 40;   // 0-100 (reduced by exercise) - was 20
 
     // Need growth rates (per minute of simulation time)
     this.growthRates = {

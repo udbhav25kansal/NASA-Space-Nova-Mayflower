@@ -71,8 +71,8 @@ export default class SceneManager {
     const height = this.canvas.clientHeight;
     const aspect = width / height;
 
-    // View size (world units shown vertically)
-    const viewSize = 10;
+    // View size (world units shown vertically) - smaller = more zoomed in
+    const viewSize = 6;
 
     // Create orthographic camera
     // Parameters: left, right, top, bottom, near, far

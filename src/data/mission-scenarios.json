@@ -1,0 +1,275 @@
+{
+  "unit_system": "SI",
+  "notes": "NASA mission scenario presets from Artemis Program, HERA analog missions, and Mars Transit Habitat studies",
+  "sources": [
+    {
+      "id": "Artemis-2024",
+      "title": "Artemis Lunar Surface Habitat Requirements",
+      "year": 2024,
+      "organization": "NASA Artemis Program"
+    },
+    {
+      "id": "HERA-2019",
+      "title": "HERA Analog Mission Protocols",
+      "year": 2019,
+      "organization": "NASA Human Exploration Research Analog"
+    },
+    {
+      "id": "IEEE-TH-2023",
+      "title": "Mars Transit Habitat Design",
+      "year": 2023,
+      "conference": "IEEE Aerospace"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "artemis_base_camp",
+      "name": "Artemis Base Camp (Lunar Surface)",
+      "description": "30-day lunar surface mission with 4 crew members at lunar south pole",
+      "mission_type": "lunar_surface",
+      "crew_size": 4,
+      "mission_duration_days": 30,
+      "habitat_config": {
+        "type": "rigid_cylinder",
+        "width": 4.5,
+        "depth": 8.0,
+        "height": 3.0,
+        "levels": 1
+      },
+      "required_modules": [
+        "Crew Quarters",
+        "Crew Quarters",
+        "Crew Quarters",
+        "Crew Quarters",
+        "Hygiene",
+        "WCS",
+        "Galley",
+        "Ward/Dining",
+        "Workstation",
+        "EVA Prep",
+        "Airlock",
+        "Medical"
+      ],
+      "recommended_objects": [
+        "spacesuit_emu",
+        "spacesuit_storage",
+        "ared",
+        "medical_kit",
+        "galley_station",
+        "computer_workstation"
+      ],
+      "mission_parameters": {
+        "eva_frequency_per_week": 3,
+        "exercise_duration_hours_per_day": 2.5,
+        "science_time_hours_per_day": 4.0,
+        "communication_delay_seconds": 2.6,
+        "psychological_stressors": ["isolation", "confinement", "limited_privacy"],
+        "source": "Artemis-2024"
+      }
+    },
+    {
+      "id": "hera_analog",
+      "name": "HERA Analog Mission (Earth-based)",
+      "description": "45-day analog mission simulating deep space isolation",
+      "mission_type": "analog_simulation",
+      "crew_size": 4,
+      "mission_duration_days": 45,
+      "habitat_config": {
+        "type": "rigid_cylinder",
+        "width": 12.0,
+        "depth": 8.0,
+        "height": 3.0,
+        "levels": 1
+      },
+      "required_modules": [
+        "Crew Quarters",
+        "Crew Quarters",
+        "Crew Quarters",
+        "Crew Quarters",
+        "Hygiene",
+        "WCS",
+        "Exercise",
+        "Galley",
+        "Ward/Dining",
+        "Workstation",
+        "Medical"
+      ],
+      "recommended_objects": [
+        "sleep_pod",
+        "treadmill",
+        "galley_station",
+        "plant_growth_chamber",
+        "computer_workstation",
+        "comm_panel"
+      ],
+      "mission_parameters": {
+        "eva_frequency_per_week": 0,
+        "exercise_duration_hours_per_day": 2.0,
+        "science_time_hours_per_day": 6.0,
+        "communication_delay_seconds": 0,
+        "psychological_stressors": ["isolation", "confinement", "monotony", "limited_contact"],
+        "source": "HERA-2019"
+      }
+    },
+    {
+      "id": "mars_transit",
+      "name": "Mars Transit Habitat (Deep Space)",
+      "description": "180-day transit to Mars with 4 crew in hybrid inflatable habitat",
+      "mission_type": "deep_space_transit",
+      "crew_size": 4,
+      "mission_duration_days": 180,
+      "habitat_config": {
+        "type": "hybrid_transhab",
+        "width": 8.0,
+        "depth": 8.5,
+        "height": 8.5,
+        "levels": 3
+      },
+      "required_modules": [
+        "Crew Quarters",
+        "Crew Quarters",
+        "Crew Quarters",
+        "Crew Quarters",
+        "Hygiene",
+        "WCS",
+        "Exercise",
+        "Galley",
+        "Ward/Dining",
+        "Workstation",
+        "Laboratory",
+        "Medical",
+        "Communications",
+        "Stowage",
+        "IFM/Repair"
+      ],
+      "recommended_objects": [
+        "sleep_pod",
+        "ared",
+        "treadmill",
+        "plant_growth_chamber",
+        "galley_station",
+        "food_storage_bag",
+        "medical_kit",
+        "computer_workstation",
+        "comm_panel",
+        "microscope_workstation"
+      ],
+      "mission_parameters": {
+        "eva_frequency_per_week": 0,
+        "exercise_duration_hours_per_day": 2.5,
+        "science_time_hours_per_day": 5.0,
+        "communication_delay_seconds": 1200,
+        "psychological_stressors": ["extreme_isolation", "confinement", "monotony", "communication_delay", "radiation_concern"],
+        "source": "IEEE-TH-2023"
+      }
+    },
+    {
+      "id": "gateway_station",
+      "name": "Lunar Gateway Station (Orbital)",
+      "description": "90-day rotation at Gateway lunar orbital station",
+      "mission_type": "lunar_orbital",
+      "crew_size": 4,
+      "mission_duration_days": 90,
+      "habitat_config": {
+        "type": "modular_assembly",
+        "width": 4.5,
+        "depth": 18.0,
+        "height": 3.0,
+        "levels": 1
+      },
+      "required_modules": [
+        "Crew Quarters",
+        "Crew Quarters",
+        "Crew Quarters",
+        "Crew Quarters",
+        "Hygiene",
+        "WCS",
+        "Exercise",
+        "Galley",
+        "Ward/Dining",
+        "Workstation",
+        "Laboratory",
+        "Medical",
+        "Communications",
+        "Window Station"
+      ],
+      "recommended_objects": [
+        "sleep_pod",
+        "ared",
+        "galley_station",
+        "plant_growth_chamber",
+        "computer_workstation",
+        "comm_panel",
+        "sample_storage_freezer"
+      ],
+      "mission_parameters": {
+        "eva_frequency_per_week": 1,
+        "exercise_duration_hours_per_day": 2.5,
+        "science_time_hours_per_day": 4.0,
+        "communication_delay_seconds": 2.6,
+        "psychological_stressors": ["microgravity", "confinement", "limited_privacy", "communication_delay"],
+        "source": "Artemis-2024"
+      }
+    },
+    {
+      "id": "mars_surface_hab",
+      "name": "Mars Surface Habitat (Long Duration)",
+      "description": "500-day surface mission on Mars with full lab capabilities",
+      "mission_type": "mars_surface",
+      "crew_size": 6,
+      "mission_duration_days": 500,
+      "habitat_config": {
+        "type": "inflatable_beam",
+        "width": 8.0,
+        "depth": 12.0,
+        "height": 5.0,
+        "levels": 2
+      },
+      "required_modules": [
+        "Crew Quarters",
+        "Crew Quarters",
+        "Crew Quarters",
+        "Crew Quarters",
+        "Crew Quarters",
+        "Crew Quarters",
+        "Hygiene",
+        "WCS",
+        "Exercise",
+        "Galley",
+        "Ward/Dining",
+        "Workstation",
+        "Laboratory",
+        "Medical",
+        "EVA Prep",
+        "Airlock",
+        "Communications",
+        "Stowage",
+        "IFM/Repair",
+        "Window Station"
+      ],
+      "recommended_objects": [
+        "sleep_pod",
+        "ared",
+        "treadmill",
+        "plant_growth_chamber",
+        "spacesuit_emu",
+        "spacesuit_storage",
+        "galley_station",
+        "food_storage_bag",
+        "medical_kit",
+        "computer_workstation",
+        "comm_panel",
+        "microscope_workstation",
+        "sample_storage_freezer"
+      ],
+      "mission_parameters": {
+        "eva_frequency_per_week": 4,
+        "exercise_duration_hours_per_day": 2.5,
+        "science_time_hours_per_day": 6.0,
+        "communication_delay_seconds": 1320,
+        "psychological_stressors": ["extreme_isolation", "confinement", "monotony", "communication_delay", "no_abort_option"],
+        "source": "IEEE-TH-2023"
+      }
+    }
+  ]
+}

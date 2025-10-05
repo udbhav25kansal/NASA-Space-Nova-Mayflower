@@ -371,6 +371,21 @@ class TileSystem {
   reset() {
     this.tiles = this.initializeTiles();
   }
+
+  /**
+   * Resize tile system with new dimensions
+   * Used when habitat configuration changes
+   *
+   * @param {number} newWidth - New width in tiles
+   * @param {number} newHeight - New height in tiles
+   */
+  resize(newWidth, newHeight) {
+    this.width = newWidth;
+    this.height = newHeight;
+    this.tiles = this.initializeTiles();
+
+    console.log(`📐 Tile system resized: ${newWidth} × ${newHeight} tiles (${newWidth * this.tileSize}m × ${newHeight * this.tileSize}m)`);
+  }
 }
 
 export default TileSystem;

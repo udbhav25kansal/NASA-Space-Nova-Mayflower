@@ -1,0 +1,201 @@
+{
+  "facility_name": "HERA (Human Exploration Research Analog)",
+  "location": "Building 220, NASA Johnson Space Center",
+  "source": "NASA Flight Analogs Technical Documentation - July 2019",
+  "unit_system": "SI",
+
+  "exact_dimensions": {
+    "total_volume_m3": 148.6,
+    "total_area_sqft": 636,
+    "total_length_m": 14.3,
+    "total_length_ft": 47,
+
+    "core": {
+      "diameter_m": 5.9,
+      "diameter_ft": 19.3,
+      "volume_m3": 56.0,
+      "area_sqft": 187,
+      "description": "Two-story cylindrical core with vertical axis"
+    },
+
+    "loft": {
+      "volume_m3": 69.9,
+      "area_sqft": 349,
+      "description": "Upper level habitation area"
+    },
+
+    "airlock": {
+      "diameter_m": 2.6,
+      "diameter_ft": 8.5,
+      "volume_m3": 8.6,
+      "area_sqft": 42,
+      "description": "Simulated airlock for EVA training"
+    },
+
+    "hygiene_module": {
+      "length_m": 4.0,
+      "length_ft": 13.25,
+      "volume_m3": 14.1,
+      "area_sqft": 58,
+      "description": "Separate hygiene module with shower, sink, toilet"
+    }
+  },
+
+  "mission_parameters": {
+    "crew_size": 4,
+    "crew_ratio_goal": "50/50 male:female",
+    "mission_duration_max_days": 45,
+    "mission_duration_range_days": [7, 45],
+    "pre_confinement_days": 16,
+    "post_confinement_days": 7,
+    "total_study_days": 68,
+
+    "isolation_protocol": {
+      "no_internet": true,
+      "no_social_media": true,
+      "no_tv_radio": true,
+      "no_phone": true,
+      "newspaper_uplinks": ["Houston Chronicle", "USA Today"],
+      "newspaper_frequency": "Monday-Friday",
+      "family_conference_frequency": "Once per week (private)",
+      "medical_conference_frequency": "Once per week (private)",
+      "psychological_conference_frequency": "Once per week (private)",
+      "limited_entertainment": "Controlled account with select movies and music"
+    }
+  },
+
+  "daily_schedule": {
+    "lights_on": "07:00",
+    "lights_out": "23:00",
+    "awake_hours": 16,
+    "sleep_hours": 8,
+    "no_napping": true,
+
+    "typical_day_breakdown": {
+      "sleep_period_hours": 8.0,
+      "post_sleep_period_hours": 1.5,
+      "daily_planning_conferences_hours": 2.0,
+      "work_research_tasks_hours": 7.25,
+      "midday_meal_hours": 1.0,
+      "exercise_period_hours": 1.75,
+      "pre_sleep_period_hours": 2.0
+    },
+
+    "weekly_schedule": {
+      "work_days": 5.5,
+      "off_duty_days": 1.5,
+      "weekend_housekeeping_hours": 1.0
+    }
+  },
+
+  "facility_layout": {
+    "levels": 3,
+
+    "level_1_core": {
+      "areas": [
+        "Airlock",
+        "Medical/Science Station",
+        "Flight Deck",
+        "General Maintenance Workstation",
+        "Robotic On-Board Trainer"
+      ]
+    },
+
+    "level_2_loft": {
+      "areas": [
+        "Wardroom Table",
+        "Galley",
+        "Communication Station",
+        "Aerobic Exercise Device"
+      ]
+    },
+
+    "level_3_loft": {
+      "areas": [
+        "Crew Quarters 1",
+        "Crew Quarters 2",
+        "Crew Quarters 3",
+        "Crew Quarters 4"
+      ],
+      "crew_quarters_count": 4,
+      "privacy": "Individual private sleep quarters"
+    },
+
+    "hygiene_module_separate": {
+      "areas": [
+        "Sink",
+        "Shower",
+        "Toilet"
+      ],
+      "separation": "Isolated from main habitat"
+    }
+  },
+
+  "operational_capabilities": {
+    "mission_control_center": {
+      "location": "Building 220, JSC",
+      "surveillance": "24/7 video with audio (excluding sleep quarters, hygiene, private conferences)",
+      "voice_communications": "Flight-like system with recordings",
+      "communication_delay_max_minutes": 20,
+      "aos_los_simulation": true
+    },
+
+    "equipment_provided": {
+      "laptops_windows": "One per crew member",
+      "ipads": "One per crew member",
+      "flight_simulators": "Multi Mission Space Exploration Vehicle (MMSEV)",
+      "vr_simulation": "Simulated EVA tasks",
+      "heart_rate_monitors": true,
+      "actigraphy": true,
+      "charging_stations": "120V AC and USB ports",
+      "exercise_equipment": "Aerobic and resistive",
+      "3d_printer": true,
+      "adjustable_led_lighting": "Level 2 only",
+      "modifiable_virtual_windows": true,
+      "temperature_control": true
+    },
+
+    "galley_hygiene": {
+      "meals_per_day": 3,
+      "food_types": ["thermo-stabilized", "rehydratable", "natural"],
+      "no_fresh_food": "No refrigeration inside HERA",
+      "plumbed_water": true,
+      "hot_cold_water": true,
+      "shower_capability": true
+    }
+  },
+
+  "crew_requirements": {
+    "citizenship": "US citizen or Green Card holder",
+    "age_range_preferred": [30, 55],
+    "height_max_m": 1.88,
+    "height_max_ft": 6.17,
+    "height_max_inches": 74,
+    "medical": "Modified Class III flight physical",
+    "education": "Bachelor's in STEM (engineering, biological science, physical science, mathematics)",
+    "advanced_degree_preferred": "M.S. or Ph.D. in STEM",
+    "psychological_screening": "Clinical psychologist assessment required",
+    "astronaut_like_characteristics": true
+  },
+
+  "nasa_compliance": {
+    "iss_schedule_based": true,
+    "exploration_mission_analog": true,
+    "isolation_confinement_remote_conditions": true,
+    "behavioral_health_focus": true,
+    "communication_autonomy_studies": true,
+    "human_factors_evaluations": true
+  },
+
+  "simulator_mapping": {
+    "use_core_diameter": 5.9,
+    "use_total_length": 14.3,
+    "use_3_level_layout": true,
+    "crew_quarters_count": 4,
+    "separate_hygiene_module": true,
+    "airlock_included": true,
+    "mission_duration_days": 45,
+    "crew_size_fixed": 4,
+    "daily_schedule_16_8": true
+  }
+}

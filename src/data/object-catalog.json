@@ -1,0 +1,300 @@
+{
+  "unit_system": "SI",
+  "notes": "NASA-validated object masses from Mars Transit Habitat Master Equipment List (IEEE TH-Design 2023) and ISS heritage equipment databases",
+  "sources": [
+    {
+      "id": "IEEE-TH-2023-MEL",
+      "title": "Mars Transit Habitat Master Equipment List",
+      "year": 2023,
+      "conference": "IEEE Aerospace",
+      "citation": "Equipment mass breakdown from NASA TransHab design"
+    },
+    {
+      "id": "NASA-ISS-Heritage",
+      "title": "ISS Equipment Database",
+      "organization": "NASA",
+      "notes": "Mass data from ISS operational equipment"
+    },
+    {
+      "id": "NASA-TP-2015-218570",
+      "title": "Habitat Logistics Mass Calculator",
+      "year": 2015,
+      "organization": "NASA"
+    }
+  ],
+  "object_categories": [
+    {
+      "category": "Crew Support",
+      "objects": [
+        {
+          "id": "spacesuit_emu",
+          "name": "EMU Spacesuit",
+          "description": "Extravehicular Mobility Unit - complete EVA suit",
+          "mass_kg": 127.0,
+          "dimensions_m": {"width": 0.8, "depth": 0.6, "height": 1.8},
+          "volume_m3": 0.86,
+          "source": "NASA-ISS-Heritage",
+          "notes": "ISS EMU mass; includes PLSS (Portable Life Support System)",
+          "placeable": true,
+          "resizable": false,
+          "zone_requirement": "dirty"
+        },
+        {
+          "id": "spacesuit_storage",
+          "name": "Suit Storage Rack",
+          "description": "Rack for storing EMU components",
+          "mass_kg": 45.0,
+          "dimensions_m": {"width": 1.2, "depth": 0.6, "height": 2.0},
+          "volume_m3": 1.44,
+          "source": "NASA-ISS-Heritage",
+          "placeable": true,
+          "resizable": false,
+          "zone_requirement": "dirty"
+        },
+        {
+          "id": "sleep_pod",
+          "name": "Crew Sleep Pod",
+          "description": "Individual sleep accommodation with privacy curtain",
+          "mass_kg": 68.0,
+          "dimensions_m": {"width": 0.85, "depth": 2.0, "height": 0.85},
+          "volume_m3": 1.45,
+          "source": "IEEE-TH-2023-MEL",
+          "notes": "Mass includes structure, restraints, lighting, ventilation",
+          "placeable": true,
+          "resizable": false,
+          "zone_requirement": "clean"
+        },
+        {
+          "id": "crew_mannequin",
+          "name": "Crew Member (Mannequin)",
+          "description": "Human model for ergonomic testing (50th percentile)",
+          "mass_kg": 75.0,
+          "dimensions_m": {"width": 0.5, "depth": 0.3, "height": 1.75},
+          "volume_m3": 0.07,
+          "source": "NASA anthropometric data",
+          "notes": "Representative crew member mass with clothing",
+          "placeable": true,
+          "resizable": false,
+          "zone_requirement": null
+        }
+      ]
+    },
+    {
+      "category": "Exercise & Health",
+      "objects": [
+        {
+          "id": "ared",
+          "name": "ARED (Advanced Resistive Exercise Device)",
+          "description": "ISS-heritage resistive exercise equipment",
+          "mass_kg": 272.0,
+          "dimensions_m": {"width": 1.4, "depth": 0.9, "height": 2.1},
+          "volume_m3": 2.65,
+          "source": "NASA-ISS-Heritage",
+          "notes": "Critical for bone/muscle health in microgravity",
+          "placeable": true,
+          "resizable": false,
+          "zone_requirement": "dirty"
+        },
+        {
+          "id": "treadmill",
+          "name": "T2 Treadmill",
+          "description": "Compact treadmill with vibration isolation",
+          "mass_kg": 106.0,
+          "dimensions_m": {"width": 0.8, "depth": 1.6, "height": 1.3},
+          "volume_m3": 1.66,
+          "source": "NASA-ISS-Heritage",
+          "notes": "Smaller than ISS COLBERT treadmill",
+          "placeable": true,
+          "resizable": false,
+          "zone_requirement": "dirty"
+        },
+        {
+          "id": "medical_kit",
+          "name": "Crew Medical Kit",
+          "description": "Emergency medical supplies and medications",
+          "mass_kg": 15.5,
+          "dimensions_m": {"width": 0.5, "depth": 0.4, "height": 0.3},
+          "volume_m3": 0.06,
+          "source": "NASA-TP-2015-218570",
+          "placeable": true,
+          "resizable": true,
+          "min_scale": 0.5,
+          "max_scale": 2.0,
+          "zone_requirement": "clean"
+        }
+      ]
+    },
+    {
+      "category": "Food & Galley",
+      "objects": [
+        {
+          "id": "galley_station",
+          "name": "Galley Food Prep Station",
+          "description": "Food rehydration and warming station",
+          "mass_kg": 85.0,
+          "dimensions_m": {"width": 0.8, "depth": 0.6, "height": 1.8},
+          "volume_m3": 0.86,
+          "source": "IEEE-TH-2023-MEL",
+          "notes": "Includes water dispenser and food warmer",
+          "placeable": true,
+          "resizable": false,
+          "zone_requirement": "clean"
+        },
+        {
+          "id": "food_storage_bag",
+          "name": "Food Storage Bag (30-day)",
+          "description": "Vacuum-packed food supply bag",
+          "mass_kg": 22.5,
+          "dimensions_m": {"width": 0.4, "depth": 0.3, "height": 0.5},
+          "volume_m3": 0.06,
+          "source": "NASA-TP-2015-218570",
+          "notes": "Per crew member, 30-day supply at 0.75 kg/day",
+          "placeable": true,
+          "resizable": true,
+          "min_scale": 0.5,
+          "max_scale": 3.0,
+          "zone_requirement": "clean"
+        },
+        {
+          "id": "water_dispenser",
+          "name": "Potable Water Dispenser",
+          "description": "Hot/cold water dispenser for food and hygiene",
+          "mass_kg": 45.0,
+          "dimensions_m": {"width": 0.5, "depth": 0.4, "height": 0.8},
+          "volume_m3": 0.16,
+          "source": "NASA-ISS-Heritage",
+          "placeable": true,
+          "resizable": false,
+          "zone_requirement": "clean"
+        }
+      ]
+    },
+    {
+      "category": "Science & Research",
+      "objects": [
+        {
+          "id": "plant_growth_chamber",
+          "name": "Plant Growth Facility (Veggie)",
+          "description": "LED-lit plant growth chamber for fresh food",
+          "mass_kg": 34.0,
+          "dimensions_m": {"width": 0.6, "depth": 0.5, "height": 0.4},
+          "volume_m3": 0.12,
+          "source": "NASA-ISS-Heritage",
+          "notes": "ISS Veggie heritage; provides psychological benefits",
+          "placeable": true,
+          "resizable": true,
+          "min_scale": 0.7,
+          "max_scale": 2.0,
+          "zone_requirement": "clean"
+        },
+        {
+          "id": "sample_storage_freezer",
+          "name": "Sample Storage Freezer",
+          "description": "Cryogenic sample storage for science",
+          "mass_kg": 68.0,
+          "dimensions_m": {"width": 0.5, "depth": 0.5, "height": 0.7},
+          "volume_m3": 0.18,
+          "source": "NASA-ISS-Heritage",
+          "placeable": true,
+          "resizable": false,
+          "zone_requirement": "clean"
+        },
+        {
+          "id": "microscope_workstation",
+          "name": "Microscope & Analysis Station",
+          "description": "Optical microscope with computer interface",
+          "mass_kg": 28.0,
+          "dimensions_m": {"width": 0.6, "depth": 0.5, "height": 0.5},
+          "volume_m3": 0.15,
+          "source": "NASA-ISS-Heritage",
+          "placeable": true,
+          "resizable": false,
+          "zone_requirement": "clean"
+        }
+      ]
+    },
+    {
+      "category": "Stowage & Logistics",
+      "objects": [
+        {
+          "id": "cargo_transfer_bag",
+          "name": "Cargo Transfer Bag (CTB)",
+          "description": "Soft-sided cargo stowage bag",
+          "mass_kg": 12.0,
+          "dimensions_m": {"width": 0.5, "depth": 0.4, "height": 0.6},
+          "volume_m3": 0.12,
+          "source": "NASA-ISS-Heritage",
+          "notes": "Standard ISS stowage bag",
+          "placeable": true,
+          "resizable": true,
+          "min_scale": 0.5,
+          "max_scale": 2.5,
+          "zone_requirement": null
+        },
+        {
+          "id": "resupply_rack",
+          "name": "Resupply Storage Rack",
+          "description": "Modular stowage rack system",
+          "mass_kg": 55.0,
+          "dimensions_m": {"width": 1.0, "depth": 0.5, "height": 2.0},
+          "volume_m3": 1.0,
+          "source": "NASA-ISS-Heritage",
+          "placeable": true,
+          "resizable": false,
+          "zone_requirement": null
+        },
+        {
+          "id": "tool_chest",
+          "name": "Maintenance Tool Chest",
+          "description": "IFM tools and spare parts storage",
+          "mass_kg": 38.0,
+          "dimensions_m": {"width": 0.7, "depth": 0.5, "height": 0.6},
+          "volume_m3": 0.21,
+          "source": "IEEE-TH-2023-MEL",
+          "placeable": true,
+          "resizable": true,
+          "min_scale": 0.6,
+          "max_scale": 1.8,
+          "zone_requirement": "dirty"
+        }
+      ]
+    },
+    {
+      "category": "Workstations",
+      "objects": [
+        {
+          "id": "computer_workstation",
+          "name": "Crew Computer Workstation",
+          "description": "Multi-function computer with display",
+          "mass_kg": 22.0,
+          "dimensions_m": {"width": 0.6, "depth": 0.15, "height": 0.5},
+          "volume_m3": 0.045,
+          "source": "IEEE-TH-2023-MEL",
+          "notes": "Includes display, computer, keyboard",
+          "placeable": true,
+          "resizable": false,
+          "zone_requirement": "clean"
+        },
+        {
+          "id": "comm_panel",
+          "name": "Communications Panel",
+          "description": "Audio/video comm interface to Earth",
+          "mass_kg": 18.0,
+          "dimensions_m": {"width": 0.5, "depth": 0.2, "height": 0.6},
+          "volume_m3": 0.06,
+          "source": "NASA-ISS-Heritage",
+          "placeable": true,
+          "resizable": false,
+          "zone_requirement": "clean"
+        }
+      ]
+    }
+  ],
+  "mass_budget_guidelines": {
+    "crew_mass_per_person_kg": 75.0,
+    "personal_allowance_per_crew_kg": 25.0,
+    "total_equipment_mass_reference_kg": 2850,
+    "source": "IEEE-TH-2023-MEL Section 5.2",
+    "notes": "Total equipment mass for 4-crew TransHab reference: 2,850 kg"
+  }
+}

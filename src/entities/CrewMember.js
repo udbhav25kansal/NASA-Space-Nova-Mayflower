@@ -165,6 +165,7 @@ class CrewMember extends THREE.Group {
       if (this.actionQueue.length > 0) {
         this.currentAction = this.actionQueue.shift();
         this.currentAction.start(this);
+        console.log(`${this.name}: Starting action ${this.currentAction.constructor.name}`);
       } else {
         this.currentAction = null;
       }

@@ -1,0 +1,313 @@
+{
+  "unit_system": "SI",
+  "notes": "NASA-validated habitat configurations from IEEE TH-Design 2023 (Moon to Mars Transit Habitat) and other NASA sources",
+  "sources": [
+    {
+      "id": "IEEE-TH-2023",
+      "title": "NASA's Moon to Mars (M2M) Transit Habitat Refinement Point of Departure Design",
+      "year": 2023,
+      "authors": "Choate et al.",
+      "conference": "IEEE Aerospace",
+      "citation": "NASA government reference design for Mars Transit Habitat"
+    },
+    {
+      "id": "NASA-TP-2020-220505",
+      "title": "Deep Space Habitability Design Guidelines",
+      "year": 2020,
+      "organization": "NASA"
+    },
+    {
+      "id": "AIAA-2022",
+      "title": "Internal Layout of a Lunar Surface Habitat",
+      "year": 2022,
+      "conference": "AIAA ASCEND"
+    }
+  ],
+  "habitat_types": [
+    {
+      "id": "hybrid_transhab",
+      "name": "Hybrid TransHab (NASA Reference Design)",
+      "type": "hybrid",
+      "description": "NASA's Moon to Mars Transit Habitat - hybrid configuration with metallic core and inflatable section",
+      "source": "IEEE-TH-2023",
+      "structure": {
+        "metallic_section": {
+          "diameter_m": 3.0,
+          "length_m": 7.0,
+          "volume_m3": 40,
+          "material": "Al-Li 2050",
+          "features": ["radial_docking_port", "eva_hatch", "solar_array", "radiators", "propulsion"]
+        },
+        "inflatable_section": {
+          "diameter_m": 8.0,
+          "length_m": 8.5,
+          "volume_m3": 360,
+          "total_volume_m3": 400,
+          "material": "softgoods_restraint_layer",
+          "internal_core_diameter_m": 3.0,
+          "pressurized_volume_m3": 342,
+          "habitable_volume_m3": 235,
+          "stowage_volume_m3": 55,
+          "systems_volume_m3": 30,
+          "voids_volume_m3": 22
+        }
+      },
+      "dimensions": {
+        "total_length_m": 22.0,
+        "max_diameter_m": 8.0,
+        "total_pressurized_volume_m3": 400,
+        "habitable_volume_per_crew_m3": 59,
+        "operating_pressure_psia": 14.7,
+        "max_design_pressure_psia": 15.2,
+        "min_operating_pressure_psia": 10.2
+      },
+      "crew_capacity": {
+        "nominal": 4,
+        "maximum": 4,
+        "mission_duration_days": 1200,
+        "habitable_volume_per_crew_m3": 59
+      },
+      "mass": {
+        "control_mass_kg": 26400,
+        "dry_mass_kg": 24499,
+        "wet_mass_kg": 46220,
+        "source": "IEEE-TH-2023 Master Equipment List"
+      },
+      "launch_constraints": {
+        "max_diameter_stowed_m": 5.0,
+        "max_length_stowed_m": 14.9,
+        "launch_vehicle": "Commercial Launch Vehicle to MEO",
+        "deployment": "autonomous_inflation_after_launch"
+      },
+      "certification": "NASA-STD-3001 Volume 1 Revision B compliant",
+      "notes": "Three-level internal layout with 6 longerons and shear panels in inflatable core. Four integrated windows. External features on metallic section only."
+    },
+    {
+      "id": "rigid_cylinder",
+      "name": "Rigid Metallic Cylinder",
+      "type": "rigid",
+      "description": "Traditional metallic habitat module, ISS-heritage design",
+      "source": "NASA-TP-2020-220505",
+      "structure": {
+        "material": "Al-Li 2050 or equivalent",
+        "construction": "welded_barrel_sections"
+      },
+      "dimensions": {
+        "diameter_m": 4.5,
+        "length_m": 8.0,
+        "total_pressurized_volume_m3": 127,
+        "habitable_volume_m3": 90,
+        "operating_pressure_psia": 14.7
+      },
+      "crew_capacity": {
+        "nominal": 2,
+        "maximum": 4,
+        "mission_duration_days": 180,
+        "habitable_volume_per_crew_m3": 45
+      },
+      "mass": {
+        "estimated_dry_mass_kg": 18000,
+        "notes": "Higher mass per volume than inflatable due to metallic structure"
+      },
+      "launch_constraints": {
+        "max_diameter_m": 4.5,
+        "max_length_m": 8.0,
+        "launch_vehicle": "Falcon Heavy (5.2m fairing) or SLS (8.4m fairing)",
+        "deployment": "launched_fully_deployed"
+      },
+      "notes": "Heritage ISS module design. Single-level internal layout. Suitable for lunar surface or Gateway augmentation."
+    },
+    {
+      "id": "inflatable_beam",
+      "name": "Large Inflatable (BEAM-style)",
+      "type": "inflatable",
+      "description": "Bigelow Expandable Activity Module derivative for deep space",
+      "source": "ISS BEAM + NASA adaptations",
+      "structure": {
+        "material": "Vectran softgoods with micrometeoroid shielding",
+        "construction": "expandable_softgoods"
+      },
+      "dimensions": {
+        "diameter_m": 6.0,
+        "length_m": 10.0,
+        "total_pressurized_volume_m3": 282,
+        "habitable_volume_m3": 220,
+        "operating_pressure_psia": 14.7
+      },
+      "crew_capacity": {
+        "nominal": 3,
+        "maximum": 4,
+        "mission_duration_days": 365,
+        "habitable_volume_per_crew_m3": 73
+      },
+      "mass": {
+        "estimated_dry_mass_kg": 12000,
+        "notes": "Lightweight due to softgoods construction"
+      },
+      "launch_constraints": {
+        "max_diameter_stowed_m": 3.0,
+        "max_length_stowed_m": 4.0,
+        "launch_vehicle": "Falcon Heavy (5.2m fairing)",
+        "deployment": "pressurization_deployment_after_docking"
+      },
+      "notes": "Lower mass than metallic but requires external mounting structure for hardware. Two-level layout possible."
+    },
+    {
+      "id": "modular_assembly",
+      "name": "Multi-Module Assembly",
+      "type": "modular",
+      "description": "ISS-style connected modules for scalable habitat",
+      "source": "NASA-TP-2020-220505",
+      "structure": {
+        "modules": 3,
+        "module_diameter_m": 4.5,
+        "module_length_m": 6.0,
+        "connection_type": "Common Berthing Mechanism"
+      },
+      "dimensions": {
+        "total_length_m": 18.0,
+        "max_diameter_m": 4.5,
+        "total_pressurized_volume_m3": 285,
+        "habitable_volume_m3": 200,
+        "operating_pressure_psia": 14.7
+      },
+      "crew_capacity": {
+        "nominal": 4,
+        "maximum": 6,
+        "mission_duration_days": 365,
+        "habitable_volume_per_crew_m3": 50
+      },
+      "mass": {
+        "estimated_dry_mass_kg": 45000,
+        "notes": "Highest mass option but most flexible configuration"
+      },
+      "launch_constraints": {
+        "modules_per_launch": 1,
+        "total_launches_required": 3,
+        "launch_vehicle": "Multiple launches - SLS or Falcon Heavy",
+        "deployment": "on_orbit_assembly_required"
+      },
+      "notes": "Requires multiple launches and on-orbit assembly. Maximum flexibility for layout reconfiguration."
+    }
+  ],
+  "habitat_customization_limits": {
+    "hybrid_transhab": {
+      "diameter_range_m": { "min": 7.0, "max": 8.5, "default": 8.0 },
+      "length_range_m": { "min": 7.0, "max": 10.0, "default": 8.5 },
+      "volume_calculation": "inflatable_cylinder_with_toroids",
+      "constraints": [
+        "Must maintain 3m internal core for structural support",
+        "Minimum 6 longerons required for loads",
+        "Windows only in cylindrical section (10+ hoop straps from toroid)",
+        "External hardware on metallic section only"
+      ]
+    },
+    "rigid_cylinder": {
+      "diameter_range_m": { "min": 3.0, "max": 5.0, "default": 4.5 },
+      "length_range_m": { "min": 6.0, "max": 12.0, "default": 8.0 },
+      "volume_calculation": "simple_cylinder",
+      "constraints": [
+        "Diameter limited by launch vehicle fairing",
+        "Length limited by structural stability",
+        "Single-level if diameter < 4.0m",
+        "Multi-level possible if diameter >= 4.5m"
+      ]
+    },
+    "inflatable_beam": {
+      "diameter_range_m": { "min": 5.0, "max": 8.0, "default": 6.0 },
+      "length_range_m": { "min": 8.0, "max": 12.0, "default": 10.0 },
+      "volume_calculation": "inflatable_cylinder",
+      "constraints": [
+        "Stowed diameter limited to 3.0m for launch",
+        "Requires pressurization for deployment",
+        "No external hardware mounting on softgoods",
+        "Certification per JSC-67721 (Inflatable Softgoods Structures)"
+      ]
+    },
+    "modular_assembly": {
+      "modules_range": { "min": 2, "max": 5, "default": 3 },
+      "module_diameter_m": 4.5,
+      "module_length_range_m": { "min": 4.0, "max": 8.0, "default": 6.0 },
+      "volume_calculation": "sum_of_module_cylinders",
+      "constraints": [
+        "Each module launched separately",
+        "Requires Common Berthing Mechanism interfaces",
+        "Minimum 2 docking ports per module for connectivity",
+        "Maximum 5 modules for structural loads"
+      ]
+    }
+  },
+  "launch_vehicle_constraints": {
+    "sls_block_1": {
+      "name": "Space Launch System Block 1",
+      "payload_fairing": {
+        "diameter_m": 8.4,
+        "height_m": 19.1,
+        "usable_volume_m3": 1057
+      },
+      "max_payload_mass_kg": 27000,
+      "destination": "Trans-Lunar Injection (TLI)",
+      "notes": "Can accommodate largest habitat diameters"
+    },
+    "falcon_heavy": {
+      "name": "SpaceX Falcon Heavy",
+      "payload_fairing": {
+        "diameter_m": 5.2,
+        "height_m": 13.1,
+        "usable_volume_m3": 220
+      },
+      "max_payload_mass_kg": 16800,
+      "destination": "Trans-Lunar Injection (TLI)",
+      "notes": "Diameter constraint for rigid habitats; inflatable OK"
+    },
+    "starship_hls": {
+      "name": "Starship Human Landing System",
+      "payload_fairing": {
+        "diameter_m": 9.0,
+        "height_m": 18.0,
+        "usable_volume_m3": 1100
+      },
+      "max_payload_mass_kg": 100000,
+      "destination": "Lunar surface or TLI",
+      "notes": "Largest capacity; enables very large habitats"
+    }
+  },
+  "interior_layout_levels": {
+    "single_level": {
+      "min_diameter_m": 3.0,
+      "max_diameter_m": 4.0,
+      "floor_height_m": 0.0,
+      "ceiling_height_m": 2.4,
+      "usable_height_m": 2.4
+    },
+    "two_level": {
+      "min_diameter_m": 4.5,
+      "max_diameter_m": 6.5,
+      "level_1_floor_m": 0.0,
+      "level_2_floor_m": 2.5,
+      "ceiling_height_m": 5.0,
+      "usable_height_per_level_m": 2.4
+    },
+    "three_level": {
+      "min_diameter_m": 7.0,
+      "max_diameter_m": 8.5,
+      "level_1_floor_m": 0.0,
+      "level_2_floor_m": 2.8,
+      "level_3_floor_m": 5.6,
+      "ceiling_height_m": 8.5,
+      "usable_height_per_level_m": 2.4,
+      "notes": "NASA TransHab reference design has three levels"
+    }
+  },
+  "nasa_compliance_requirements": {
+    "minimum_volume_per_crew_m3": 25,
+    "recommended_volume_per_crew_m3": 50,
+    "optimal_volume_per_crew_m3": 60,
+    "mission_duration_impact": "Volume requirements increase with mission duration per NASA-STD-3001",
+    "references": [
+      "NASA-STD-3001 Volume 1 Revision B",
+      "NASA/TP-2020-220505 Section 3.2",
+      "Stromgren et al. 2020 - Defining Required Net Habitable Volume"
+    ]
+  }
+}

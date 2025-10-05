@@ -11,6 +11,7 @@
  * - User interface and controls
  */
 
+import * as THREE from 'three';
 import SceneManager from './scene/SceneManager.js';
 import GridSystem from './scene/GridSystem.js';
 import TileSystem from './scene/TileSystem.js';
@@ -22,6 +23,10 @@ import ModuleControls from './controls/ModuleControls.js';
 import HUD from './ui/HUD.js';
 import Catalog from './ui/Catalog.js';
 import Toast from './ui/Toast.js';
+import HabitatConfigurator from './ui/HabitatConfigurator.js';
+import ObjectCatalog from './ui/ObjectCatalog.js';
+import PathMeasurement from './ui/PathMeasurement.js';
+import ScenarioLoader from './ui/ScenarioLoader.js';
 import LayoutExporter from './export/LayoutExporter.js';
 
 // Phase 2: Psychological Simulation
@@ -29,6 +34,12 @@ import { PsychModel } from './simulation/PsychModel.js';
 import { MissionParams } from './simulation/MissionParams.js';
 import { WellbeingMap } from './visualization/WellbeingMap.js';
 import { CSVGenerator } from './export/CSVGenerator.js';
+
+// Mars-Sim Integration: NASA-Validated Psychological Features
+import { SleepModel } from './simulation/SleepModel.js';
+import { MissionSimulator } from './simulation/MissionSimulator.js';
+import { RecreationValidator } from './validation/RecreationValidator.js';
+import { PrivacyValidator } from './validation/PrivacyValidator.js';
 
 // CorsixTH Integration: Pathfinding & Character Movement
 import Pathfinder from './simulation/Pathfinder.js';
@@ -58,6 +69,10 @@ class HabitatHarmonyApp {
     this.moduleControls = null;
     this.hud = null;
     this.catalog = null;
+    this.habitatConfigurator = null;
+    this.objectCatalog = null;
+    this.pathMeasurement = null;
+    this.scenarioLoader = null;
     this.exporter = null;
 
     this.moduleIdCounter = 0;
@@ -68,6 +83,14 @@ class HabitatHarmonyApp {
     this.wellbeingMap = null;
     this.currentDayMetrics = null;
     this.fullMissionResults = null;
+
+    // Mars-Sim Components (NASA-validated psychological features)
+    this.sleepModel = null;
+    this.missionSimulator = null;
+    this.recreationValidator = null;
+    this.privacyValidator = null;
+    this.crew = []; // Separate from crewMembers (pathfinding)
+    this.crewAssignments = {}; // Maps crew ID to module ID
 
     // CorsixTH Integration: Tile-based system & Pathfinding
     this.tileSystem = null;
@@ -221,14 +244,42 @@ class HabitatHarmonyApp {
     // Initialize HUD
     this.hud = new HUD(this.validator);
 
+    // Initialize Habitat Configurator (Gap #1: Habitat customization)
+    this.habitatConfigurator = new HabitatConfigurator((config) => {
+      this.updateHabitatConfiguration(config);
+    });
+    this.habitatConfigurator.render();
+
     // Initialize Catalog
     this.catalog = new Catalog(ModuleCatalog, (catalogItem) => {
       this.addModule(catalogItem);
     });
     this.catalog.render();
 
+    // Initialize Object Catalog (Gap #3: Object placement)
+    this.objectCatalog = new ObjectCatalog((objectDef) => {
+      this.addObject(objectDef);
+    });
+
+    // Initialize Path Measurement (Gap #4: Path measurement)
+    this.pathMeasurement = new PathMeasurement(
+      this.sceneManager,
+      this.sceneManager.getCamera(),
+      this.tileSystem,
+      this.validator
+    );
+
+    // Initialize Scenario Loader (Gap #5: Mission scenarios)
+    this.scenarioLoader = new ScenarioLoader((scenario) => {
+      this.loadMissionScenario(scenario);
+    });
+    this.scenarioLoader.render();
+
     // Setup tile visualization toggle button
     this.setupTileVisualizationToggle();
+
+    // Setup path measurement button
+    this.setupPathMeasurementButton();
 
     console.log('✅ UI components initialized');
   }
@@ -255,6 +306,98 @@ class HabitatHarmonyApp {
         Toast.show('Tile visualization disabled', 2000);
       }
     });
+  }
+
+  /**
+   * Setup path measurement toggle button
+   */
+  setupPathMeasurementButton() {
+    const pathBtn = document.getElementById('pathMeasureBtn');
+    if (!pathBtn) return;
+
+    pathBtn.addEventListener('click', () => {
+      const enabled = this.pathMeasurement.toggle();
+
+      if (enabled) {
+        pathBtn.textContent = '📏 Measuring...';
+        pathBtn.style.background = 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)';
+        pathBtn.style.color = '#ffffff';
+        Toast.show('Click points to measure path', 3000);
+      } else {
+        pathBtn.textContent = '📏 Measure Path';
+        pathBtn.style.background = '';
+        pathBtn.style.color = '';
+      }
+    });
+
+    // ESC key to clear path
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && this.pathMeasurement.isActive) {
+        this.pathMeasurement.clear();
+      }
+    });
+
+    // Click to add path points
+    const canvas = document.getElementById('c');
+    canvas.addEventListener('click', (e) => {
+      if (!this.pathMeasurement.isActive) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const mouse = new THREE.Vector2(
+        ((e.clientX - rect.left) / rect.width) * 2 - 1,
+        -((e.clientY - rect.top) / rect.height) * 2 + 1
+      );
+
+      const raycaster = new THREE.Raycaster();
+      raycaster.setFromCamera(mouse, this.sceneManager.getCamera());
+
+      // Raycast to floor
+      const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+      const intersection = new THREE.Vector3();
+      raycaster.ray.intersectPlane(floorPlane, intersection);
+
+      if (intersection) {
+        this.pathMeasurement.addPoint(intersection);
+      }
+    });
+  }
+
+  /**
+   * Update habitat configuration (Gap #1: Habitat customization)
+   * @param {Object} config - Habitat configuration from HabitatConfigurator
+   */
+  updateHabitatConfiguration(config) {
+    console.log('🏗️ Updating habitat configuration:', config);
+
+    // Update grid system dimensions
+    this.gridSystem.updateHabitatSize(config);
+
+    // Update tile system dimensions (width and depth in tiles)
+    const widthTiles = Math.round(config.width / this.tileSystem.tileSize);
+    const depthTiles = Math.round(config.depth / this.tileSystem.tileSize);
+    this.tileSystem.resize(widthTiles, depthTiles);
+
+    // Update pathfinder with new tile system
+    this.pathfinder = new Pathfinder(this.tileSystem);
+    window.pathfinder = this.pathfinder;
+
+    // Update tile visualization
+    this.sceneManager.removeObject(this.tileVisualization);
+    this.tileVisualization = new TileVisualization(this.tileSystem);
+    this.sceneManager.addObject(this.tileVisualization);
+    window.tileViz = this.tileVisualization;
+
+    // Revalidate all modules with new dimensions
+    this.updateLayout();
+
+    // Show notification
+    const habitatType = this.habitatConfigurator?.currentConfig?.type || 'custom';
+    Toast.show(`Habitat updated: ${config.width}m × ${config.depth}m (${habitatType})`, 3000);
+
+    console.log(`✅ Habitat configuration updated`);
+    console.log(`   Dimensions: ${config.width}m × ${config.depth}m × ${config.height}m`);
+    console.log(`   Levels: ${config.levels}`);
+    console.log(`   Tiles: ${widthTiles} × ${depthTiles}`);
   }
 
   /**
@@ -376,6 +519,96 @@ class HabitatHarmonyApp {
   }
 
   /**
+   * Add an object to the habitat (Gap #3: Object placement)
+   * @param {Object} objectDef - Object definition from catalog
+   */
+  addObject(objectDef) {
+    try {
+      if (!objectDef) {
+        console.error('Invalid object definition');
+        Toast.error('Cannot add object: Invalid definition');
+        return;
+      }
+
+      // Generate unique ID
+      const id = `object_${this.objectIdCounter++}`;
+
+      // Create Three.js mesh for the object
+      const geometry = new THREE.BoxGeometry(
+        objectDef.dimensions_m.width,
+        objectDef.dimensions_m.height,
+        objectDef.dimensions_m.depth
+      );
+
+      const material = new THREE.MeshStandardMaterial({
+        color: 0xffa500,  // Orange for objects
+        transparent: true,
+        opacity: 0.7
+      });
+
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+
+      // Position at center initially (user will drag)
+      mesh.position.set(0, objectDef.dimensions_m.height / 2, 0);
+
+      // Add custom properties
+      mesh.userData = {
+        id,
+        type: 'placeable_object',
+        objectDef,
+        mass_kg: objectDef.mass_kg,
+        resizable: objectDef.resizable || false,
+        currentScale: 1.0
+      };
+
+      // Add to scene
+      this.sceneManager.addObject(mesh);
+
+      // Add to objects array
+      this.objects.push(mesh);
+
+      Toast.success(`Added ${objectDef.name} (${objectDef.mass_kg} kg)`);
+      console.log(`➕ Added object: ${objectDef.name} (ID: ${id})`);
+
+    } catch (error) {
+      console.error('Error adding object:', error);
+      Toast.error('Failed to add object');
+    }
+  }
+
+  /**
+   * Load a mission scenario preset (Gap #5: Mission scenarios)
+   * @param {Object} scenario - Scenario definition
+   */
+  loadMissionScenario(scenario) {
+    console.log('🎯 Loading mission scenario:', scenario.name);
+
+    // Clear current layout
+    this.clearLayout();
+
+    // Apply habitat configuration
+    if (this.habitatConfigurator && scenario.habitat_config) {
+      this.habitatConfigurator.currentConfig = scenario.habitat_config;
+      this.updateHabitatConfiguration(scenario.habitat_config);
+    }
+
+    // Add required modules (with small delay for visual effect)
+    scenario.required_modules.forEach((moduleName, index) => {
+      setTimeout(() => {
+        const catalogItem = ModuleCatalog.find(m => m.name === moduleName);
+        if (catalogItem) {
+          this.addModule(catalogItem);
+        }
+      }, index * 100);
+    });
+
+    // Show notification
+    Toast.show(`Loaded: ${scenario.name} (${scenario.crew_size} crew, ${scenario.mission_duration_days} days)`, 4000);
+  }
+
+  /**
    * Import layout from JSON data
    * @param {Object} data - Imported layout data
    */
@@ -471,6 +704,26 @@ class HabitatHarmonyApp {
         if (moduleA) moduleA.setViolating(true);
         if (moduleB) moduleB.setViolating(true);
       });
+    }
+
+    // NEW Mars-Sim Validations
+    if (this.recreationValidator && this.privacyValidator && this.crew.length > 0) {
+      this.autoAssignCrew();
+
+      const layout = this.getLayoutForValidation();
+
+      // Privacy validation
+      const privacyResult = this.privacyValidator.validatePrivacy(layout, this.crew);
+
+      // Recreation validation
+      const recreationResult = this.recreationValidator.validateRecreationSpace(
+        layout,
+        this.crew.length
+      );
+
+      // Log compliance status (optional - add to HUD display later)
+      console.log('Privacy Compliance:', privacyResult.compliance ? '✅' : '❌');
+      console.log('Recreation Compliance:', recreationResult.compliance ? '✅' : '❌');
     }
 
     // Phase 2: Update psychological metrics when layout changes
@@ -598,15 +851,17 @@ class HabitatHarmonyApp {
     // Store module reference
     object.module = module;
 
-    // Position object in world
+    // Position object RELATIVE to module (since it will be added as a child)
+    // tileX and tileY are relative to module's bottom-left corner
     if (module.tileSystem) {
-      const worldTileX = module.tileX + tileX;
-      const worldTileY = module.tileY + tileY;
-      const worldPos = module.tileSystem.tileToWorld(worldTileX, worldTileY);
-      object.position.set(worldPos.x, 0, worldPos.z);
+      const tileSize = module.tileSystem.tileSize;
+      // Convert relative tile coordinates to relative world position
+      const relativeX = (tileX - module.tileWidth / 2) * tileSize;
+      const relativeZ = (tileY - module.tileHeight / 2) * tileSize;
+      object.position.set(relativeX, 0, relativeZ);
     }
 
-    // Add to module
+    // Add to module (as a child, so position is relative to module)
     module.add(object);
     module.objects.push(object);
 
@@ -625,20 +880,23 @@ class HabitatHarmonyApp {
     if (!module || !module.tileSystem) return;
 
     const moduleName = module.moduleName;
-    const centerTile = module.getCenterTile();
+
+    // Calculate RELATIVE center tile (relative to module's bottom-left corner)
+    const relativeCenterX = Math.floor(module.tileWidth / 2);
+    const relativeCenterY = Math.floor(module.tileHeight / 2);
 
     // Add objects based on module type
     if (moduleName === 'Exercise') {
-      this.spawnObject('exercise_equipment', module, centerTile.x, centerTile.y);
+      this.spawnObject('exercise_equipment', module, relativeCenterX, relativeCenterY);
     } else if (moduleName === 'Crew Quarters') {
-      this.spawnObject('sleep_pod', module, centerTile.x, centerTile.y);
+      this.spawnObject('sleep_pod', module, relativeCenterX, relativeCenterY);
     } else if (moduleName === 'Workstation') {
-      this.spawnObject('workstation', module, centerTile.x, centerTile.y);
+      this.spawnObject('workstation', module, relativeCenterX, relativeCenterY);
     } else if (moduleName === 'Galley') {
-      this.spawnObject('galley_station', module, centerTile.x, centerTile.y);
+      this.spawnObject('galley_station', module, relativeCenterX, relativeCenterY);
     }
 
-    console.log(`✅ Populated ${moduleName} with objects`);
+    console.log(`✅ Populated ${moduleName} with objects at relative tile (${relativeCenterX}, ${relativeCenterY})`);
   }
 
   /**
@@ -653,10 +911,100 @@ class HabitatHarmonyApp {
   }
 
   /**
+   * Initialize default crew (HERA baseline: 4 crew)
+   */
+  initializeCrew() {
+    const defaultCrew = this.constraints.crew_configuration_defaults.standard_crew;
+
+    this.crew = defaultCrew.composition.map((member, index) => ({
+      id: `crew-${index + 1}`,
+      name: member.role,
+      role: member.role,
+      gender: member.gender,
+      state: {
+        stress: 40,
+        mood: 70,
+        sleepQuality: 70,
+        cohesion: 70,
+        performance: 1.0
+      }
+    }));
+
+    console.log(`👥 Initialized ${this.crew.length} crew members for psychological simulation`);
+  }
+
+  /**
+   * Auto-assign crew to available crew quarters
+   */
+  autoAssignCrew() {
+    this.crewAssignments = {};
+
+    const crewQuarters = this.modules.filter(m => m.moduleName === 'Crew Quarters');
+
+    if (crewQuarters.length === 0) {
+      console.warn('No crew quarters available for assignment');
+      return;
+    }
+
+    // Assign crew to quarters (1 per quarters ideally, 2 max)
+    let quarterIndex = 0;
+    let occupancyCount = {};
+
+    for (const member of this.crew) {
+      if (quarterIndex >= crewQuarters.length) {
+        quarterIndex = 0; // Start sharing quarters
+      }
+
+      const quarters = crewQuarters[quarterIndex];
+      occupancyCount[quarters.id] = (occupancyCount[quarters.id] || 0) + 1;
+
+      this.crewAssignments[member.id] = {
+        moduleId: quarters.id,
+        moduleName: quarters.moduleName
+      };
+
+      // Move to next quarters if this one has 2 occupants
+      if (occupancyCount[quarters.id] >= 2) {
+        quarterIndex++;
+      }
+    }
+
+    console.log('🛏️ Crew auto-assigned to quarters');
+  }
+
+  /**
+   * Create layout object for validators and simulator
+   */
+  getLayoutForValidation() {
+    return {
+      modules: this.modules.map(m => ({
+        id: m.id,
+        name: m.moduleName,
+        dimensions: {
+          w: m.width,
+          d: m.depth,
+          h: m.height
+        },
+        position: {
+          x: m.mesh.position.x,
+          z: m.mesh.position.z
+        },
+        zone: m.zone
+      })),
+      crewAssignments: this.crewAssignments,
+      windowType: this.missionParams?.windowType || 0.5,
+      visualOrder: 0.8,
+      lightingScheduleCompliance: this.missionParams?.lightingCompliance || 0.8,
+      exerciseCompliance: this.missionParams?.exerciseCompliance || 0.7,
+      adjacencyCompliance: this.validator.calculateAdjacencyCompliance(this.modules)
+    };
+  }
+
+  /**
    * Phase 2: Initialize psychological simulation system
    */
   async initPhase2() {
-    console.log('🧠 Initializing Phase 2: Psychological Simulation...');
+    console.log('🧠 Initializing Phase 2: Psychological Simulation with Mars-Sim enhancements...');
 
     try {
       // Load psych model parameters
@@ -666,10 +1014,20 @@ class HabitatHarmonyApp {
       }
       const psychModelParams = await response.json();
 
-      // Initialize PsychModel with HERA+UND parameters
+      // Initialize EXISTING PsychModel with HERA+UND parameters
       this.psychModel = new PsychModel(psychModelParams);
       this.missionParams = new MissionParams();
       this.wellbeingMap = new WellbeingMap(this.sceneManager);
+
+      // NEW Mars-Sim Components
+      this.sleepModel = new SleepModel(this.constraints);
+      this.recreationValidator = new RecreationValidator(this.constraints);
+      this.privacyValidator = new PrivacyValidator(this.constraints);
+
+      // Initialize default crew (4 person HERA baseline)
+      this.initializeCrew();
+
+      console.log('✅ Mars-Sim components initialized');
     } catch (error) {
       console.error('Failed to initialize Phase 2:', error);
       Toast.error('Failed to load psychological model parameters');
@@ -682,7 +1040,7 @@ class HabitatHarmonyApp {
     // Initialize with default metrics
     this.updatePsychMetrics();
 
-    console.log('✅ Phase 2 initialized successfully');
+    console.log('✅ Phase 2 initialized successfully with Mars-Sim features');
   }
 
   /**
@@ -893,40 +1251,76 @@ class HabitatHarmonyApp {
   }
 
   /**
-   * Run full 45-day mission simulation
+   * Run full mission simulation (Mars-Sim Enhanced)
    */
   runFullMissionSimulation() {
     try {
-      Toast.show('Running 45-day simulation...', 1500);
+      Toast.show('Running enhanced mission simulation...', 2000);
 
-      // Compute design variables
-      const designVars = this.missionParams.computeDesignVariables(
-        this.modules,
-        this.validator
+      // Get mission parameters directly from missionParams
+      const { crewSize, missionDays } = this.missionParams;
+
+      // Auto-assign crew to quarters
+      this.autoAssignCrew();
+
+      // Validate privacy and recreation
+      const layout = this.getLayoutForValidation();
+      const privacyResult = this.privacyValidator.validatePrivacy(layout, this.crew);
+      const recreationResult = this.recreationValidator.validateRecreationSpace(layout, this.crew.length);
+
+      // Show validation warnings
+      if (!privacyResult.compliance) {
+        Toast.show(`⚠️ Privacy violations: ${privacyResult.violations.length}`, 3000);
+      }
+      if (!recreationResult.compliance) {
+        Toast.show(`⚠️ Recreation space insufficient`, 3000);
+      }
+
+      // Create Mission Simulator with Mars-Sim features
+      this.missionSimulator = new MissionSimulator(
+        layout,
+        {
+          crewSize: crewSize,
+          missionDays: missionDays,
+          names: this.crew.map(c => c.name),
+          roles: this.crew.map(c => c.role),
+          genders: this.crew.map(c => c.gender)
+        },
+        this.constraints,
+        this.psychModel.params
       );
 
-      // Run full simulation
-      this.fullMissionResults = this.psychModel.simulateMission(designVars);
+      // Run simulation
+      const results = this.missionSimulator.run();
+      this.fullMissionResults = results.dailyMetrics;
 
-      // Update UI to show day 45 results
+      // Update UI to show final day results
       const currentDayEl = document.getElementById('currentDay');
       const currentDayValEl = document.getElementById('currentDayVal');
       if (currentDayEl && currentDayValEl) {
-        currentDayEl.value = this.missionParams.missionDays;
-        currentDayValEl.textContent = `Day ${this.missionParams.missionDays}`;
+        currentDayEl.value = missionDays;
+        currentDayValEl.textContent = `Day ${missionDays}`;
       }
 
       // Get final day metrics
-      this.currentDayMetrics = this.fullMissionResults[this.fullMissionResults.length - 1];
-      const phi = this.currentDayMetrics.psychHealthIndex;
+      const finalDay = results.dailyMetrics[results.dailyMetrics.length - 1];
+      this.currentDayMetrics = finalDay.teamAverage;
+
+      // Calculate PHI
+      const phi = this.psychModel.calculatePHI(this.currentDayMetrics);
 
       this.updateMetricsDisplay(this.currentDayMetrics, phi);
 
-      Toast.show(`Simulation complete! Final PHI: ${phi.toFixed(1)}`, 3000);
+      Toast.show(`✅ Simulation complete! Final PHI: ${phi.toFixed(1)}`, 3000);
+
+      // Show recommendations
+      if (results.recommendations.length > 0) {
+        console.log('📋 NASA Recommendations:', results.recommendations);
+      }
 
     } catch (error) {
       console.error('Error running mission simulation:', error);
-      Toast.show('Simulation failed. Check console for errors.', 3000);
+      Toast.show('❌ Simulation failed. Check console for errors.', 3000);
     }
   }
 
@@ -964,51 +1358,58 @@ class HabitatHarmonyApp {
   }
 
   /**
-   * Export metrics to CSV
+   * Export metrics to CSV (Mars-Sim Enhanced)
    */
   exportMetricsCSV() {
     try {
       // Check if simulation has been run
       if (!this.fullMissionResults || this.fullMissionResults.length === 0) {
-        Toast.show('Please run 45-day simulation first!', 3000);
+        Toast.show('Please run simulation first!', 3000);
         return;
       }
 
-      // Gather all data
+      // Get layout for validation
+      const layout = this.getLayoutForValidation();
+
+      // Compute design variables
       const designVars = this.missionParams.computeDesignVariables(
         this.modules,
         this.validator
       );
 
-      // Get constraint report from HUD
+      // Get constraint report
       const hudReport = this.hud.getLastReport();
       const constraintReport = {
         adjacencyCompliance: designVars.adjacencyCompliance,
         pathWidthOk: hudReport?.pathWidthOk !== false
       };
 
-      // Generate CSV
+      // Get full simulation report
+      const simulationReport = this.missionSimulator ?
+        this.missionSimulator.generateReport() : null;
+
+      // Generate CSV (Mars-Sim Enhanced)
       const csv = CSVGenerator.generateCSV(
         this.modules,
         designVars,
         this.fullMissionResults,
-        constraintReport
+        constraintReport,
+        simulationReport  // NEW: Includes per-crew data
       );
 
       if (csv) {
-        // Download
         const timestamp = new Date().toISOString().split('T')[0];
-        const filename = `habitat-harmony-${timestamp}.csv`;
+        const filename = `habitat-harmony-mars-sim-${timestamp}.csv`;
         CSVGenerator.downloadCSV(csv, filename);
 
-        Toast.show(`Exported metrics to ${filename}`, 3000);
+        Toast.show(`📊 Exported to ${filename}`, 3000);
       } else {
-        Toast.show('CSV export failed. Check console for errors.', 3000);
+        Toast.show('CSV export failed', 3000);
       }
 
     } catch (error) {
       console.error('Error exporting CSV:', error);
-      Toast.show('CSV export failed. Check console for errors.', 3000);
+      Toast.show('CSV export failed', 3000);
     }
   }
 }
