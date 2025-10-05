@@ -92,15 +92,23 @@ export class CSVGenerator {
       csv += 'Day,Stress,Mood,Sleep Quality,Cohesion,Performance,Psych Health Index\n';
 
       for (const result of missionResults) {
+        // Handle both direct properties and teamAverage structure
+        const metrics = result.teamAverage || result;
+
+        const stress = metrics.stress || 0;
+        const mood = metrics.mood || 0;
+        const sleepQuality = metrics.sleepQuality || 0;
+        const cohesion = metrics.cohesion || 0;
+
         const phi = result.psychHealthIndex !== undefined ? result.psychHealthIndex :
-                     ((100 - result.stress) + result.mood + result.sleepQuality + result.cohesion) / 4;
+                     ((100 - stress) + mood + sleepQuality + cohesion) / 4;
         const perf = result.performance !== undefined ? result.performance : 1.0;
 
         csv += `${result.day},`;
-        csv += `${result.stress.toFixed(2)},`;
-        csv += `${result.mood.toFixed(2)},`;
-        csv += `${result.sleepQuality.toFixed(2)},`;
-        csv += `${result.cohesion.toFixed(2)},`;
+        csv += `${stress.toFixed(2)},`;
+        csv += `${mood.toFixed(2)},`;
+        csv += `${sleepQuality.toFixed(2)},`;
+        csv += `${cohesion.toFixed(2)},`;
         csv += `${perf.toFixed(3)},`;
         csv += `${phi.toFixed(2)}\n`;
       }
