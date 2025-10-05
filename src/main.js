@@ -84,16 +84,24 @@ class HabitatHarmonyApp {
     try {
       const response = await fetch('/src/data/nasa-constraints.json');
       if (!response.ok) {
-        throw new Error('Failed to load NASA constraints');
+        throw new Error(`Failed to load NASA constraints: ${response.status} ${response.statusText}`);
       }
 
-      this.constraints = await response.json();
+      const data = await response.json();
+
+      // Validate loaded data
+      if (!data || typeof data !== 'object') {
+        throw new Error('Invalid constraints data format');
+      }
+
+      this.constraints = data;
       this.validator = new ConstraintValidator(this.constraints);
 
       console.log('✅ NASA constraints loaded');
 
     } catch (error) {
       console.error('Failed to load constraints:', error);
+      Toast.error('Failed to load NASA constraints');
       throw error;
     }
   }
@@ -220,30 +228,50 @@ class HabitatHarmonyApp {
    * @param {Object} catalogItem - Module definition from catalog
    */
   addModule(catalogItem) {
-    // Generate unique ID
-    const id = `module_${this.moduleIdCounter++}`;
+    try {
+      if (!catalogItem) {
+        console.error('Invalid catalog item');
+        Toast.error('Cannot add module: Invalid item');
+        return;
+      }
 
-    // Create module
-    const module = new HabitatModule(catalogItem, id, this.constraints);
+      // Generate unique ID
+      const id = `module_${this.moduleIdCounter++}`;
 
-    // Add to scene
-    this.sceneManager.addObject(module);
+      // Create module
+      const module = new HabitatModule(catalogItem, id, this.constraints);
 
-    // Add to modules array
-    this.modules.push(module);
+      if (!module) {
+        throw new Error('Failed to create module');
+      }
 
-    // Update drag controls with new modules array
-    this.dragControls.setModules(this.modules);
+      // Add to scene
+      this.sceneManager.addObject(module);
 
-    // Select the new module
-    this.dragControls.selectModule(module);
-    this.moduleControls.setSelectedModule(module);
+      // Add to modules array
+      this.modules.push(module);
 
-    // Update layout
-    this.updateLayout();
+      // Update drag controls with new modules array
+      if (this.dragControls) {
+        this.dragControls.setModules(this.modules);
 
-    Toast.success(`Added ${catalogItem.name}`);
-    console.log(`➕ Added module: ${catalogItem.name} (ID: ${id})`);
+        // Select the new module
+        this.dragControls.selectModule(module);
+      }
+
+      if (this.moduleControls) {
+        this.moduleControls.setSelectedModule(module);
+      }
+
+      // Update layout
+      this.updateLayout();
+
+      Toast.success(`Added ${catalogItem.name || 'Module'}`);
+      console.log(`➕ Added module: ${catalogItem.name || 'Unknown'} (ID: ${id})`);
+    } catch (error) {
+      console.error('Error adding module:', error);
+      Toast.error('Failed to add module');
+    }
   }
 
   /**

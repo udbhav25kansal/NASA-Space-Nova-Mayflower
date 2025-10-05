@@ -40,8 +40,21 @@ export default class ConstraintValidator {
    * @returns {Object} {valid: boolean, message: string}
    */
   validateMinimumArea(module) {
-    const actualArea = module.getFootprint();
-    const minArea = module.minArea;
+    // Null check
+    if (!module) {
+      return {
+        valid: false,
+        message: 'Invalid module (null or undefined)',
+        moduleId: 'unknown',
+        moduleName: 'unknown',
+        actualArea: 0,
+        requiredArea: 0,
+        source: 'validation'
+      };
+    }
+
+    const actualArea = typeof module.getFootprint === 'function' ? module.getFootprint() : 0;
+    const minArea = module.minArea || 0;
 
     const valid = actualArea >= minArea;
     const message = valid
@@ -256,8 +269,16 @@ export default class ConstraintValidator {
   checkOverlaps(modules) {
     const overlaps = [];
 
+    if (!modules || modules.length < 2) {
+      return overlaps;
+    }
+
     for (let i = 0; i < modules.length; i++) {
       for (let j = i + 1; j < modules.length; j++) {
+        // Null checks
+        if (!modules[i] || !modules[j]) continue;
+        if (typeof modules[i].checkOverlap !== 'function') continue;
+
         if (modules[i].checkOverlap(modules[j])) {
           overlaps.push({
             type: 'overlap',
@@ -280,6 +301,37 @@ export default class ConstraintValidator {
    * @returns {Object} Comprehensive validation report
    */
   validateLayout(modules, shellDimensions) {
+    // Input validation
+    if (!modules || !Array.isArray(modules)) {
+      console.error('Invalid modules array');
+      return {
+        valid: false,
+        error: 'Invalid modules array',
+        timestamp: new Date().toISOString(),
+        moduleCount: 0,
+        violations: [],
+        warnings: [],
+        compliancePercentage: 0,
+        totalFootprint: 0,
+        metrics: {}
+      };
+    }
+
+    if (!shellDimensions || !shellDimensions.width || !shellDimensions.depth) {
+      console.error('Invalid shell dimensions');
+      return {
+        valid: false,
+        error: 'Invalid shell dimensions',
+        timestamp: new Date().toISOString(),
+        moduleCount: modules.length,
+        violations: [],
+        warnings: [],
+        compliancePercentage: 0,
+        totalFootprint: 0,
+        metrics: {}
+      };
+    }
+
     const report = {
       valid: true,
       timestamp: new Date().toISOString(),
@@ -291,8 +343,24 @@ export default class ConstraintValidator {
       metrics: {}
     };
 
-    // Calculate total footprint
-    report.totalFootprint = modules.reduce((sum, m) => sum + m.getFootprint(), 0);
+    // Handle empty layout
+    if (modules.length === 0) {
+      return report;
+    }
+
+    // Calculate total footprint with error handling
+    try {
+      report.totalFootprint = modules.reduce((sum, m) => {
+        if (m && typeof m.getFootprint === 'function') {
+          return sum + m.getFootprint();
+        }
+        console.warn('Module missing getFootprint method:', m);
+        return sum;
+      }, 0);
+    } catch (error) {
+      console.error('Error calculating total footprint:', error);
+      report.totalFootprint = 0;
+    }
 
     // Track validation issues
     let totalChecks = 0;

@@ -109,32 +109,47 @@ export default class ModuleControls {
   rotateModule(module) {
     if (!module) return;
 
-    // Store original dimensions
-    const originalDims = {
-      w: module.dimensions.w,
-      d: module.dimensions.d
-    };
+    try {
+      // Verify module has required methods
+      if (typeof module.rotate90 !== 'function') {
+        console.error('Module missing rotate90 method');
+        Toast.error('Cannot rotate module');
+        return;
+      }
 
-    // Rotate the module (this swaps w and d)
-    module.rotate90();
+      // Store original dimensions
+      const originalDims = {
+        w: module.dimensions ? module.dimensions.w : 0,
+        d: module.dimensions ? module.dimensions.d : 0
+      };
 
-    // Check if new orientation is valid
-    const isValid = this.checkModulePlacement(module);
-
-    if (!isValid) {
-      // Revert rotation
+      // Rotate the module (this swaps w and d)
       module.rotate90();
-      module.rotate90();
-      module.rotate90(); // Back to original (4 * 90 = 360)
 
-      Toast.error('Cannot rotate: Would violate constraints');
-      console.log('⚠️ Rotation blocked: Would cause overlap or go out of bounds');
-    } else {
-      Toast.success(`Rotated ${module.moduleName}`);
-      console.log(`🔄 Rotated: ${module.moduleName} (${originalDims.w}×${originalDims.d} → ${module.dimensions.w}×${module.dimensions.d})`);
+      // Check if new orientation is valid
+      const isValid = this.checkModulePlacement(module);
 
-      // Update validation
-      this.onUpdate();
+      if (!isValid) {
+        // Revert rotation
+        module.rotate90();
+        module.rotate90();
+        module.rotate90(); // Back to original (4 * 90 = 360)
+
+        Toast.error('Cannot rotate: Would violate constraints');
+        console.log('⚠️ Rotation blocked: Would cause overlap or go out of bounds');
+      } else {
+        const newDims = module.dimensions || { w: 0, d: 0 };
+        Toast.success(`Rotated ${module.moduleName}`);
+        console.log(`🔄 Rotated: ${module.moduleName} (${originalDims.w}×${originalDims.d} → ${newDims.w}×${newDims.d})`);
+
+        // Update validation
+        if (typeof this.onUpdate === 'function') {
+          this.onUpdate();
+        }
+      }
+    } catch (error) {
+      console.error('Error rotating module:', error);
+      Toast.error('Failed to rotate module');
     }
   }
 
@@ -145,30 +160,43 @@ export default class ModuleControls {
   deleteModule(module) {
     if (!module) return;
 
-    const moduleName = module.moduleName;
-    const moduleId = module.moduleId;
+    try {
+      const moduleName = module.moduleName || 'Unknown Module';
+      const moduleId = module.moduleId || 'unknown';
 
-    // Remove from modules array
-    const index = this.modules.indexOf(module);
-    if (index > -1) {
-      this.modules.splice(index, 1);
-    }
+      // Remove from modules array
+      if (this.modules && Array.isArray(this.modules)) {
+        const index = this.modules.indexOf(module);
+        if (index > -1) {
+          this.modules.splice(index, 1);
+        }
+      }
 
-    // Remove from scene
-    this.scene.remove(module);
+      // Remove from scene
+      if (this.scene && typeof this.scene.remove === 'function') {
+        this.scene.remove(module);
+      }
 
-    // Dispose resources
-    module.dispose();
+      // Dispose resources
+      if (typeof module.dispose === 'function') {
+        module.dispose();
+      }
 
     // Clear selection
     this.selectedModule = null;
     this.updateButtonStates(null);
 
-    Toast.success(`Deleted ${moduleName}`);
-    console.log(`🗑️ Deleted: ${moduleName} (ID: ${moduleId})`);
+      Toast.success(`Deleted ${moduleName}`);
+      console.log(`🗑️ Deleted: ${moduleName} (ID: ${moduleId})`);
 
-    // Update validation
-    this.onUpdate();
+      // Update validation
+      if (typeof this.onUpdate === 'function') {
+        this.onUpdate();
+      }
+    } catch (error) {
+      console.error('Error deleting module:', error);
+      Toast.error('Failed to delete module');
+    }
   }
 
   /**
@@ -215,22 +243,41 @@ export default class ModuleControls {
    * @returns {boolean}
    */
   checkModulePlacement(module) {
-    // Check bounds (assuming habitat is 12m × 8m)
-    const habitatWidth = 12.0;
-    const habitatDepth = 8.0;
+    if (!module) return false;
 
-    if (!module.isWithinBounds(habitatWidth, habitatDepth)) {
-      return false;
-    }
+    try {
+      // Check bounds (assuming habitat is 12m × 8m)
+      const habitatWidth = 12.0;
+      const habitatDepth = 8.0;
 
-    // Check overlaps with other modules
-    for (const other of this.modules) {
-      if (other !== module && module.checkOverlap(other)) {
+      if (typeof module.isWithinBounds !== 'function') {
+        console.error('Module missing isWithinBounds method');
         return false;
       }
-    }
 
-    return true;
+      if (!module.isWithinBounds(habitatWidth, habitatDepth)) {
+        return false;
+      }
+
+      // Check overlaps with other modules
+      if (!this.modules || !Array.isArray(this.modules)) {
+        return true;
+      }
+
+      for (const other of this.modules) {
+        if (!other || other === module) continue;
+        if (typeof module.checkOverlap !== 'function') continue;
+
+        if (module.checkOverlap(other)) {
+          return false;
+        }
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error checking module placement:', error);
+      return false;
+    }
   }
 
   /**

@@ -62,40 +62,57 @@ export default class DragControls {
    * @param {MouseEvent} event
    */
   onMouseDown(event) {
-    // Update mouse coordinates
-    this.updateMouseCoords(event);
+    try {
+      // Update mouse coordinates
+      this.updateMouseCoords(event);
 
-    // Raycast to find intersected module
-    this.raycaster.setFromCamera(this.mouse, this.camera);
+      // Raycast to find intersected module
+      this.raycaster.setFromCamera(this.mouse, this.camera);
 
-    // Get all module meshes
-    const meshes = this.modules.map(m => m.mesh).filter(m => m);
-
-    const intersects = this.raycaster.intersectObjects(meshes, false);
-
-    if (intersects.length > 0) {
-      // Get the module from the intersected mesh
-      const mesh = intersects[0].object;
-      const module = mesh.userData.module;
-
-      if (module) {
-        // Select this module
-        this.selectModule(module);
-
-        // Start dragging
-        this.isDragging = true;
-
-        // Calculate offset from module center to intersection point
-        const intersectPoint = intersects[0].point;
-        this.dragOffset.copy(module.position).sub(intersectPoint);
-        this.dragOffset.y = 0; // Only care about XZ offset
-
-        event.preventDefault();
+      // Get all module meshes (with null checks)
+      if (!this.modules || this.modules.length === 0) {
+        return;
       }
-    } else {
-      // Clicked on empty space - deselect
-      this.deselectAll();
-      this.onUpdate();
+
+      const meshes = this.modules
+        .filter(m => m && m.mesh)
+        .map(m => m.mesh);
+
+      if (meshes.length === 0) {
+        return;
+      }
+
+      const intersects = this.raycaster.intersectObjects(meshes, false);
+
+      if (intersects.length > 0) {
+        // Get the module from the intersected mesh
+        const mesh = intersects[0].object;
+        const module = mesh.userData.module;
+
+        if (module) {
+          // Select this module
+          this.selectModule(module);
+
+          // Start dragging
+          this.isDragging = true;
+
+          // Calculate offset from module center to intersection point
+          const intersectPoint = intersects[0].point;
+          this.dragOffset.copy(module.position).sub(intersectPoint);
+          this.dragOffset.y = 0; // Only care about XZ offset
+
+          event.preventDefault();
+        }
+      } else {
+        // Clicked on empty space - deselect
+        this.deselectAll();
+        if (typeof this.onUpdate === 'function') {
+          this.onUpdate();
+        }
+      }
+    } catch (error) {
+      console.error('Error in onMouseDown:', error);
+      Toast.error('Interaction error occurred');
     }
   }
 
@@ -172,11 +189,21 @@ export default class DragControls {
    * @param {MouseEvent} event
    */
   updateMouseCoords(event) {
-    const rect = this.canvas.getBoundingClientRect();
+    try {
+      if (!this.canvas || !event) return;
 
-    // Normalize to -1 to +1
-    this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+      const rect = this.canvas.getBoundingClientRect();
+
+      // Prevent division by zero
+      const width = rect.width || 1;
+      const height = rect.height || 1;
+
+      // Normalize to -1 to +1
+      this.mouse.x = ((event.clientX - rect.left) / width) * 2 - 1;
+      this.mouse.y = -((event.clientY - rect.top) / height) * 2 + 1;
+    } catch (error) {
+      console.error('Error updating mouse coordinates:', error);
+    }
   }
 
   /**
@@ -185,21 +212,46 @@ export default class DragControls {
    * @returns {boolean} True if valid
    */
   checkPlacement(module) {
-    const habitatDims = this.gridSystem.getHabitatDimensions();
+    if (!module) return false;
 
-    // Check bounds
-    if (!module.isWithinBounds(habitatDims.width, habitatDims.depth)) {
-      return false;
-    }
+    try {
+      const habitatDims = this.gridSystem.getHabitatDimensions();
 
-    // Check overlaps with other modules
-    for (const other of this.modules) {
-      if (other !== module && module.checkOverlap(other)) {
+      // Validate dimensions
+      if (!habitatDims || !habitatDims.width || !habitatDims.depth) {
+        console.error('Invalid habitat dimensions');
         return false;
       }
-    }
 
-    return true;
+      // Check bounds
+      if (typeof module.isWithinBounds !== 'function') {
+        console.error('Module missing isWithinBounds method');
+        return false;
+      }
+
+      if (!module.isWithinBounds(habitatDims.width, habitatDims.depth)) {
+        return false;
+      }
+
+      // Check overlaps with other modules
+      if (!this.modules || this.modules.length === 0) {
+        return true;
+      }
+
+      for (const other of this.modules) {
+        if (!other || other === module) continue;
+        if (typeof module.checkOverlap !== 'function') continue;
+
+        if (module.checkOverlap(other)) {
+          return false;
+        }
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error checking placement:', error);
+      return false;
+    }
   }
 
   /**
