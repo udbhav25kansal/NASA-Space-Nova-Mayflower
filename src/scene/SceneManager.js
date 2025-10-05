@@ -310,51 +310,118 @@ export default class SceneManager {
   }
 
   /**
-   * Add lunar surface floor with crater-like details
+   * Add realistic lunar surface with beautiful craters
+   * Inspired by real Moon surface photos - multiple crater sizes and details
    */
   addLunarSurface() {
-    // Large lunar ground plane
-    const groundSize = 50;
-    const groundGeometry = new THREE.PlaneGeometry(groundSize, groundSize, 64, 64);
+    // Create detailed ground mesh
+    const groundSize = 60;
+    const groundGeometry = new THREE.PlaneGeometry(groundSize, groundSize, 128, 128);
 
-    // Add crater-like deformations
+    // Create realistic crater field
     const positions = groundGeometry.attributes.position;
+    const colors = new Float32Array(positions.count * 3);
+
+    // Define multiple craters with varying sizes and depths
+    const craters = [
+      // Large craters
+      { x: 12, z: 15, radius: 8, depth: 1.2 },
+      { x: -15, z: -10, radius: 10, depth: 1.5 },
+      { x: 20, z: -18, radius: 6, depth: 0.9 },
+
+      // Medium craters
+      { x: -8, z: 12, radius: 4, depth: 0.6 },
+      { x: 5, z: -5, radius: 3.5, depth: 0.5 },
+      { x: -20, z: 8, radius: 5, depth: 0.7 },
+      { x: 15, z: 8, radius: 3, depth: 0.4 },
+
+      // Small craters
+      { x: 0, z: 20, radius: 2, depth: 0.3 },
+      { x: -5, z: -20, radius: 1.8, depth: 0.25 },
+      { x: 8, z: -12, radius: 2.2, depth: 0.35 },
+      { x: -12, z: 18, radius: 1.5, depth: 0.2 },
+      { x: 18, z: 5, radius: 1.6, depth: 0.22 },
+      { x: -18, z: -5, radius: 1.4, depth: 0.18 },
+    ];
+
+    // Apply crater deformations and color variations
     for (let i = 0; i < positions.count; i++) {
       const x = positions.getX(i);
-      const z = positions.getY(i);  // Note: PlaneGeometry Y is our Z
+      const z = positions.getY(i);
+      let height = 0;
+      let brightness = 1.0;
 
-      // Create crater bumps using noise-like function
-      const crater1 = Math.exp(-((x - 10) ** 2 + (z - 10) ** 2) / 8) * -0.5;
-      const crater2 = Math.exp(-((x + 8) ** 2 + (z + 5) ** 2) / 12) * -0.3;
-      const crater3 = Math.exp(-((x - 5) ** 2 + (z - 15) ** 2) / 6) * -0.4;
+      // Apply each crater's influence
+      for (const crater of craters) {
+        const dx = x - crater.x;
+        const dz = z - crater.z;
+        const dist = Math.sqrt(dx * dx + dz * dz);
 
-      // Small random surface noise
-      const noise = (Math.random() - 0.5) * 0.05;
+        if (dist < crater.radius) {
+          // Crater bowl shape with raised rim
+          const normalized = dist / crater.radius;
 
-      // Set height (y becomes z in our coordinate system)
-      positions.setZ(i, crater1 + crater2 + crater3 + noise);
+          // Create rim (raised edge)
+          const rim = Math.exp(-Math.pow((normalized - 0.8), 2) / 0.02) * crater.depth * 0.3;
+
+          // Create bowl (depression)
+          const bowl = -crater.depth * (1 - Math.pow(normalized, 2.5));
+
+          height += bowl + rim;
+
+          // Darken crater interior, brighten rim
+          if (normalized < 0.6) {
+            brightness *= 0.7; // Dark crater floor
+          } else if (normalized > 0.75 && normalized < 0.95) {
+            brightness *= 1.3; // Bright crater rim
+          }
+        }
+      }
+
+      // Add fine surface texture (regolith)
+      const fineNoise = (Math.sin(x * 0.5) * Math.cos(z * 0.5) +
+                        Math.sin(x * 1.2) * Math.cos(z * 0.8)) * 0.03;
+      const randomNoise = (Math.random() - 0.5) * 0.02;
+
+      height += fineNoise + randomNoise;
+
+      // Set vertex height
+      positions.setZ(i, height);
+
+      // Set vertex color based on brightness
+      const baseColor = { r: 0.54, g: 0.53, b: 0.50 }; // Lunar gray
+      colors[i * 3] = baseColor.r * brightness;
+      colors[i * 3 + 1] = baseColor.g * brightness;
+      colors[i * 3 + 2] = baseColor.b * brightness;
     }
 
+    groundGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     groundGeometry.computeVertexNormals();
 
-    // Lunar regolith material (gray-brown with slight texture)
+    // Create beautiful lunar surface material
     const groundMaterial = new THREE.MeshStandardMaterial({
-      color: 0x8b8680,  // Lunar gray
-      roughness: 0.95,
-      metalness: 0.0,
-      flatShading: false
+      vertexColors: true,
+      roughness: 0.98,
+      metalness: 0.02,
+      emissive: 0x1a1a1a,
+      emissiveIntensity: 0.1,
     });
 
     const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-    ground.rotation.x = -Math.PI / 2;  // Rotate to be horizontal
-    ground.position.y = -0.1;  // Slightly below origin
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.y = -0.15;
     ground.receiveShadow = true;
+    ground.castShadow = false;
     this.scene.add(ground);
 
-    // Add subtle grid helper for reference (very faint)
-    const gridHelper = new THREE.GridHelper(20, 40, 0x444444, 0x222222);
+    // Add very subtle grid for reference
+    const gridHelper = new THREE.GridHelper(20, 40, 0x404040, 0x202020);
     gridHelper.position.y = 0;
+    gridHelper.material.transparent = true;
+    gridHelper.material.opacity = 0.15;
     this.scene.add(gridHelper);
+
+    console.log('🌙 Lunar surface created with', craters.length, 'craters');
   }
 
   /**
