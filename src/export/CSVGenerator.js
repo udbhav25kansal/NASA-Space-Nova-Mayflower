@@ -182,13 +182,16 @@ export class CSVGenerator {
 
     for (const metric of metrics) {
       const values = results.map(r => {
+        // Handle both direct properties and teamAverage structure
+        const data = r.teamAverage || r;
+
         if (metric === 'psychHealthIndex') {
           return r.psychHealthIndex !== undefined ? r.psychHealthIndex :
-                 ((100 - r.stress) + r.mood + r.sleepQuality + r.cohesion) / 4;
+                 ((100 - (data.stress || 0)) + (data.mood || 0) + (data.sleepQuality || 0) + (data.cohesion || 0)) / 4;
         } else if (metric === 'performance') {
           return r.performance !== undefined ? r.performance : 1.0;
         } else {
-          return r[metric];
+          return data[metric] || 0;
         }
       });
 
