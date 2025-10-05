@@ -18,10 +18,11 @@ import { PsychModel } from './PsychModel.js';
 import { SleepModel } from './SleepModel.js';
 
 export class MissionSimulator {
-  constructor(layout, crewConfig, constraints, psychParams) {
+  constructor(layout, crewConfig, constraints, psychParams, moduleImpacts = null) {
     this.layout = layout;
     this.constraints = constraints;
     this.psychParams = psychParams;
+    this.moduleImpacts = moduleImpacts;
 
     // Initialize mission parameters (HERA baseline)
     this.crewSize = crewConfig.crewSize || 4;
@@ -38,6 +39,24 @@ export class MissionSimulator {
     // Initialize models
     this.psychModel = new PsychModel(psychParams);
     this.sleepModel = new SleepModel(constraints);
+
+    // Load module impact data if not provided
+    if (!this.moduleImpacts) {
+      this.loadModuleImpacts();
+    }
+  }
+
+  /**
+   * Load module-specific psychological impact factors
+   */
+  async loadModuleImpacts() {
+    try {
+      const response = await fetch('/src/data/module-psychological-impacts.json');
+      this.moduleImpacts = await response.json();
+    } catch (error) {
+      console.warn('Could not load module impacts, using defaults:', error);
+      this.moduleImpacts = { module_impacts: {}, absence_penalties: {}, proximity_effects: {} };
+    }
   }
 
   /**
@@ -73,8 +92,111 @@ export class MissionSimulator {
   }
 
   /**
+   * Calculate module-specific psychological impacts
+   * NASA Model: Each module type has specific validated impacts on crew well-being
+   * @returns {Object} - Aggregate stress/mood/sleep/cohesion modifiers
+   */
+  calculateModuleSpecificImpacts() {
+    if (!this.layout.modules || this.layout.modules.length === 0) {
+      return { stressModifier: 0, moodModifier: 0, sleepModifier: 0, cohesionModifier: 0 };
+    }
+
+    if (!this.moduleImpacts || !this.moduleImpacts.module_impacts) {
+      return { stressModifier: 0, moodModifier: 0, sleepModifier: 0, cohesionModifier: 0 };
+    }
+
+    const impacts = this.moduleImpacts.module_impacts;
+    const absencePenalties = this.moduleImpacts.absence_penalties || {};
+    const proximityEffects = this.moduleImpacts.proximity_effects || {};
+
+    let totalStressReduction = 0;
+    let totalMoodBonus = 0;
+    let totalSleepBonus = 0;
+    let totalCohesionBonus = 0;
+
+    // Track which critical modules are present
+    const presentModules = new Set(this.layout.modules.map(m => m.name || m.moduleName));
+
+    // Calculate presence bonuses for each module
+    for (const module of this.layout.modules) {
+      const moduleName = module.name || module.moduleName;
+      const impact = impacts[moduleName];
+
+      if (impact) {
+        totalStressReduction += impact.stress_reduction || 0;
+        totalMoodBonus += impact.mood_bonus || 0;
+        totalSleepBonus += impact.sleep_quality_bonus || 0;
+        totalCohesionBonus += impact.cohesion_impact || 0;
+      }
+    }
+
+    // Calculate absence penalties for critical modules
+    const criticalModules = ['Crew Quarters', 'Hygiene', 'WCS', 'Exercise', 'Ward/Dining'];
+    for (const criticalModule of criticalModules) {
+      if (!presentModules.has(criticalModule) && absencePenalties[criticalModule]) {
+        const penalty = absencePenalties[criticalModule];
+        totalStressReduction -= penalty.stress_penalty || 0;
+        totalMoodBonus -= penalty.mood_penalty || 0;
+        totalSleepBonus -= penalty.sleep_quality_penalty || 0;
+        totalCohesionBonus -= penalty.cohesion_penalty || 0;
+      }
+    }
+
+    // Calculate proximity effects
+    for (const module1 of this.layout.modules) {
+      for (const module2 of this.layout.modules) {
+        if (module1 === module2) continue;
+
+        const name1 = module1.name || module1.moduleName;
+        const name2 = module2.name || module2.moduleName;
+        const effectKey = `${name1}_near_${name2}`;
+        const effect = proximityEffects[effectKey];
+
+        if (effect) {
+          const distance = this.calculateModuleDistance(module1, module2);
+
+          if (effect.distance_threshold_m && distance < effect.distance_threshold_m) {
+            // Penalty for too close
+            totalStressReduction -= effect.stress_penalty || 0;
+            totalMoodBonus -= effect.mood_penalty || 0;
+            totalSleepBonus -= effect.sleep_quality_penalty || 0;
+          } else if (effect.distance_bonus_m && distance <= effect.distance_bonus_m) {
+            // Bonus for optimal proximity
+            totalStressReduction += effect.stress_reduction || 0;
+            totalCohesionBonus += effect.cohesion_bonus || 0;
+          }
+        }
+      }
+    }
+
+    // Normalize to 0-1 range (convert from percentage points)
+    // Typical total bonuses: stress ~100-150, mood ~100-150, sleep ~70-100, cohesion ~50-80
+    return {
+      stressModifier: Math.max(-1, Math.min(1, totalStressReduction / 150)),
+      moodModifier: Math.max(-1, Math.min(1, totalMoodBonus / 150)),
+      sleepModifier: Math.max(-1, Math.min(1, totalSleepBonus / 100)),
+      cohesionModifier: Math.max(-1, Math.min(1, totalCohesionBonus / 80))
+    };
+  }
+
+  /**
+   * Calculate distance between two modules
+   * @param {Object} m1 - First module
+   * @param {Object} m2 - Second module
+   * @returns {Number} - Distance in meters
+   */
+  calculateModuleDistance(m1, m2) {
+    const x1 = m1.position?.x || 0;
+    const z1 = m1.position?.z || 0;
+    const x2 = m2.position?.x || 0;
+    const z2 = m2.position?.z || 0;
+
+    return Math.sqrt((x2 - x1) ** 2 + (z2 - z1) ** 2);
+  }
+
+  /**
    * Calculate design variables from current layout
-   * @returns {Object} - Design variables (P, W, V, L, A, R, E)
+   * @returns {Object} - Design variables (P, W, V, L, A, R, E) + module-specific impacts
    */
   calculateDesignVariables() {
     const layout = this.layout;
@@ -85,8 +207,8 @@ export class MissionSimulator {
     // W: Window Type (user-configurable)
     const windowType = layout.windowType !== undefined ? layout.windowType : 0.5;
 
-    // V: Visual Order (1 - overlap ratio)
-    const visualOrder = layout.visualOrder !== undefined ? layout.visualOrder : 0.8;
+    // V: Visual Order - NASA Model: organized layouts reduce cognitive load
+    const visualOrder = this.calculateVisualOrder();
 
     // L: Lighting Schedule Compliance (user-configurable)
     const lightingCompliance = layout.lightingScheduleCompliance !== undefined ?
@@ -94,7 +216,7 @@ export class MissionSimulator {
 
     // A: Adjacency Compliance (from ConstraintValidator)
     const adjacencyCompliance = layout.adjacencyCompliance !== undefined ?
-      layout.adjacencyCompliance : 0.9;
+      layout.adjacencyCompliance : 1.0;
 
     // R: Recreation Area (fraction of total area)
     const recreationArea = this.calculateRecreationFraction();
@@ -103,50 +225,182 @@ export class MissionSimulator {
     const exerciseCompliance = layout.exerciseCompliance !== undefined ?
       layout.exerciseCompliance : 0.7;
 
-    return {
+    // NEW: Module-Specific Impacts (NASA research-backed)
+    const moduleImpacts = this.calculateModuleSpecificImpacts();
+
+    const designVars = {
       privateSleepQuarters: privateQuartersFraction,
       windowType: windowType,
       visualOrder: visualOrder,
       lightingCompliance: lightingCompliance,
       adjacencyCompliance: adjacencyCompliance,
       recreationArea: recreationArea,
-      exerciseCompliance: exerciseCompliance
+      exerciseCompliance: exerciseCompliance,
+      // Add module-specific modifiers
+      moduleStressModifier: moduleImpacts.stressModifier,
+      moduleMoodModifier: moduleImpacts.moodModifier,
+      moduleSleepModifier: moduleImpacts.sleepModifier,
+      moduleCohesionModifier: moduleImpacts.cohesionModifier
     };
+
+    // Debug logging
+    console.log('🧮 Design Variables Calculated:', {
+      privacy: `${(privateQuartersFraction * 100).toFixed(0)}%`,
+      window: windowType,
+      visualOrder: `${(visualOrder * 100).toFixed(0)}%`,
+      lighting: `${(lightingCompliance * 100).toFixed(0)}%`,
+      adjacency: `${(adjacencyCompliance * 100).toFixed(0)}%`,
+      recreation: `${(recreationArea * 100).toFixed(0)}%`,
+      exercise: `${(exerciseCompliance * 100).toFixed(0)}%`,
+      moduleCount: layout.modules?.length || 0,
+      moduleImpacts: {
+        stress: moduleImpacts.stressModifier.toFixed(2),
+        mood: moduleImpacts.moodModifier.toFixed(2),
+        sleep: moduleImpacts.sleepModifier.toFixed(2),
+        cohesion: moduleImpacts.cohesionModifier.toFixed(2)
+      }
+    });
+
+    return designVars;
+  }
+
+  /**
+   * Calculate visual order metric based on layout organization
+   * NASA Model: UND study shows organized spaces reduce stress by 15-20%
+   * Factors: grid alignment, spacing uniformity, functional zoning
+   * @returns {Number} - 0-1 (higher is better organized)
+   */
+  calculateVisualOrder() {
+    if (!this.layout.modules || this.layout.modules.length === 0) return 0;
+
+    let orderScore = 0;
+    let factorCount = 0;
+
+    // Factor 1: Grid Alignment (modules aligned to 0.5m grid)
+    const gridAligned = this.layout.modules.filter(m => {
+      const x = m.position?.x || 0;
+      const z = m.position?.z || 0;
+      return (Math.abs(x % 0.5) < 0.01) && (Math.abs(z % 0.5) < 0.01);
+    }).length;
+    orderScore += gridAligned / this.layout.modules.length;
+    factorCount++;
+
+    // Factor 2: Functional Zoning (clean/dirty separation quality)
+    const cleanModules = this.layout.modules.filter(m => m.zone === 'clean');
+    const dirtyModules = this.layout.modules.filter(m => m.zone === 'dirty');
+
+    if (cleanModules.length > 0 && dirtyModules.length > 0) {
+      // Calculate average distance between clean and dirty zones
+      let totalSeparation = 0;
+      let pairCount = 0;
+
+      for (const clean of cleanModules) {
+        for (const dirty of dirtyModules) {
+          const dx = (clean.position?.x || 0) - (dirty.position?.x || 0);
+          const dz = (clean.position?.z || 0) - (dirty.position?.z || 0);
+          const distance = Math.sqrt(dx * dx + dz * dz);
+          totalSeparation += distance;
+          pairCount++;
+        }
+      }
+
+      const avgSeparation = pairCount > 0 ? totalSeparation / pairCount : 0;
+      // Normalize: 4m+ separation is ideal
+      orderScore += Math.min(1.0, avgSeparation / 4.0);
+      factorCount++;
+    }
+
+    // Factor 3: Module Overlap/Collision (penalties)
+    let overlapCount = 0;
+    for (let i = 0; i < this.layout.modules.length; i++) {
+      for (let j = i + 1; j < this.layout.modules.length; j++) {
+        if (this.modulesOverlap(this.layout.modules[i], this.layout.modules[j])) {
+          overlapCount++;
+        }
+      }
+    }
+    const overlapPenalty = Math.max(0, 1 - (overlapCount / Math.max(1, this.layout.modules.length)));
+    orderScore += overlapPenalty;
+    factorCount++;
+
+    return factorCount > 0 ? orderScore / factorCount : 0.5;
+  }
+
+  /**
+   * Check if two modules overlap
+   * @param {Object} m1 - First module
+   * @param {Object} m2 - Second module
+   * @returns {Boolean} - True if modules overlap
+   */
+  modulesOverlap(m1, m2) {
+    const x1 = m1.position?.x || 0;
+    const z1 = m1.position?.z || 0;
+    const w1 = m1.dimensions?.w || 1;
+    const d1 = m1.dimensions?.d || 1;
+
+    const x2 = m2.position?.x || 0;
+    const z2 = m2.position?.z || 0;
+    const w2 = m2.dimensions?.w || 1;
+    const d2 = m2.dimensions?.d || 1;
+
+    // Check AABB collision
+    return !(x1 + w1 / 2 < x2 - w2 / 2 ||
+             x1 - w1 / 2 > x2 + w2 / 2 ||
+             z1 + d1 / 2 < z2 - d2 / 2 ||
+             z1 - d1 / 2 > z2 + d2 / 2);
   }
 
   /**
    * Calculate fraction of crew with private quarters
+   * NASA Model: Per TP-2020-220505, private quarters reduce stress by 20-30%
    * @returns {Number} - 0-1
    */
   calculatePrivacyFraction() {
-    if (!this.layout.crewAssignments) return 0.5;
+    if (!this.layout.modules) return 0;
 
-    let privateCount = 0;
-    for (const member of this.crew) {
-      if (this.sleepModel.hasPrivateQuarters(this.layout, member.id)) {
-        privateCount++;
-      }
+    // Count crew quarters modules
+    const crewQuartersModules = this.layout.modules.filter(m =>
+      m.name === 'Crew Quarters' || m.moduleName === 'Crew Quarters'
+    );
+
+    if (crewQuartersModules.length === 0) return 0;
+
+    // NASA standard: 1.82 m² per crew member for private quarters
+    // Calculate if each crew member has sufficient private space
+    const totalQuartersArea = crewQuartersModules.reduce((sum, m) =>
+      sum + (m.dimensions.w * m.dimensions.d), 0
+    );
+
+    const minAreaPerCrew = 1.82; // NASA TP-2020-220505
+    const requiredArea = this.crewSize * minAreaPerCrew;
+
+    // If enough area exists, calculate based on module count vs crew size
+    if (totalQuartersArea >= requiredArea) {
+      // Assume equal distribution: privacy = min(1, modules/crew)
+      return Math.min(1.0, crewQuartersModules.length / this.crewSize);
+    } else {
+      // Insufficient area: scale by area ratio
+      return Math.min(1.0, totalQuartersArea / requiredArea);
     }
-
-    return privateCount / this.crewSize;
   }
 
   /**
    * Calculate fraction of habitat area devoted to recreation
-   * @returns {Number} - 0-1
+   * NASA Model: HERA recommends 15-25% recreation area for optimal cohesion
+   * @returns {Number} - 0-1 (0.15-0.25 is optimal per HERA)
    */
   calculateRecreationFraction() {
-    if (!this.layout.modules) return 0.15;
+    if (!this.layout.modules || this.layout.modules.length === 0) return 0;
 
     const recreationTypes = ['Ward/Dining', 'Recreation', 'Exercise'];
     const recreationArea = this.layout.modules
-      .filter(m => recreationTypes.includes(m.name))
+      .filter(m => recreationTypes.includes(m.name) || recreationTypes.includes(m.moduleName))
       .reduce((sum, m) => sum + (m.dimensions.w * m.dimensions.d), 0);
 
     const totalArea = this.layout.modules
       .reduce((sum, m) => sum + (m.dimensions.w * m.dimensions.d), 0);
 
-    return totalArea > 0 ? recreationArea / totalArea : 0.15;
+    return totalArea > 0 ? Math.min(1.0, recreationArea / totalArea) : 0;
   }
 
   /**

@@ -67,31 +67,63 @@ class CrewMember extends THREE.Group {
   createVisual() {
     const group = new THREE.Group();
 
-    // Body (capsule)
-    const bodyGeometry = new THREE.CapsuleGeometry(0.2, 0.6, 8, 16);
+    // Body (capsule) - white spacesuit
+    const bodyGeometry = new THREE.CapsuleGeometry(0.25, 0.8, 8, 16);
     const bodyMaterial = new THREE.MeshStandardMaterial({
-      color: 0xf0f0f0,
-      metalness: 0.3,
-      roughness: 0.7
+      color: 0xffffff,
+      metalness: 0.4,
+      roughness: 0.6,
+      emissive: 0x444444,
+      emissiveIntensity: 0.1
     });
     const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-    body.position.y = 0.5;
+    body.position.y = 0.6;
     body.castShadow = true;
+    body.receiveShadow = true;
     group.add(body);
 
-    // Helmet (sphere)
-    const helmetGeometry = new THREE.SphereGeometry(0.15, 16, 16);
+    // Helmet (sphere) - blue/gold visor
+    const helmetGeometry = new THREE.SphereGeometry(0.18, 16, 16);
     const helmetMaterial = new THREE.MeshStandardMaterial({
-      color: 0x2563eb,
-      metalness: 0.5,
-      roughness: 0.3,
+      color: 0x3b82f6,
+      metalness: 0.8,
+      roughness: 0.2,
+      transparent: true,
+      opacity: 0.85,
+      emissive: 0x1e40af,
+      emissiveIntensity: 0.2
+    });
+    const helmet = new THREE.Mesh(helmetGeometry, helmetMaterial);
+    helmet.position.y = 1.1;
+    helmet.castShadow = true;
+    helmet.receiveShadow = true;
+    group.add(helmet);
+
+    // Life support backpack
+    const backpackGeometry = new THREE.BoxGeometry(0.25, 0.4, 0.15);
+    const backpackMaterial = new THREE.MeshStandardMaterial({
+      color: 0xcccccc,
+      metalness: 0.6,
+      roughness: 0.4
+    });
+    const backpack = new THREE.Mesh(backpackGeometry, backpackMaterial);
+    backpack.position.set(0, 0.7, -0.15);
+    backpack.castShadow = true;
+    group.add(backpack);
+
+    // Glowing chest indicator (status light)
+    const indicatorGeometry = new THREE.SphereGeometry(0.04, 8, 8);
+    const indicatorMaterial = new THREE.MeshStandardMaterial({
+      color: 0x10b981,
+      emissive: 0x10b981,
+      emissiveIntensity: 1.0,
       transparent: true,
       opacity: 0.9
     });
-    const helmet = new THREE.Mesh(helmetGeometry, helmetMaterial);
-    helmet.position.y = 0.9;
-    helmet.castShadow = true;
-    group.add(helmet);
+    const indicator = new THREE.Mesh(indicatorGeometry, indicatorMaterial);
+    indicator.position.set(0, 0.8, 0.22);
+    group.add(indicator);
+    this.statusIndicator = indicator;
 
     // Name label (for debugging - can be replaced with sprite later)
     this.nameLabel = this.createNameLabel(this.name);

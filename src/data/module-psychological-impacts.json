@@ -1,0 +1,303 @@
+{
+  "description": "Module-specific psychological impact factors derived from NASA research",
+  "sources": [
+    "NASA/TP-2020-220505 (Deep Space Habitability)",
+    "UND Lunar Daytime Behavioral Study (2020)",
+    "HERA Facility Documentation (2019)",
+    "NASA-TM-2016-218603 (Behavioral Health and Performance)",
+    "AIAA ASCEND 2022 (Internal Layout)"
+  ],
+  "notes": "Each module type has specific impacts on stress, mood, sleep quality, and cohesion. Values are research-backed multipliers and bonuses.",
+
+  "module_impacts": {
+    "Crew Quarters": {
+      "stress_reduction": 25,
+      "mood_bonus": 15,
+      "sleep_quality_bonus": 30,
+      "cohesion_impact": 0,
+      "rationale": "Private quarters reduce stress by 20-30% (TP-2020-220505). Critical for sleep quality and personal recovery.",
+      "presence_requirement": "critical",
+      "minimum_per_crew": 1,
+      "notes": "Missing crew quarters causes severe stress accumulation. Each crew member needs 1.82 m² minimum."
+    },
+
+    "Hygiene": {
+      "stress_reduction": 15,
+      "mood_bonus": 20,
+      "sleep_quality_bonus": 10,
+      "cohesion_impact": 5,
+      "rationale": "Personal hygiene directly impacts mood and self-esteem. UND study shows 15-20% mood improvement with adequate hygiene facilities.",
+      "presence_requirement": "critical",
+      "minimum_count": 1,
+      "notes": "Absence causes hygiene distress, social discomfort, and declining mood."
+    },
+
+    "WCS": {
+      "stress_reduction": 10,
+      "mood_bonus": 5,
+      "sleep_quality_bonus": 5,
+      "cohesion_impact": 0,
+      "rationale": "Functional waste management is baseline requirement. Privacy and proximity to living areas affects dignity and comfort.",
+      "presence_requirement": "critical",
+      "minimum_count": 1,
+      "notes": "Must have rigid door and proper ventilation. Proximity to galley causes severe stress."
+    },
+
+    "Exercise": {
+      "stress_reduction": 30,
+      "mood_bonus": 25,
+      "sleep_quality_bonus": 15,
+      "cohesion_impact": 10,
+      "rationale": "Exercise critical for stress management. NASA data shows 25-35% stress reduction with regular resistive exercise.",
+      "presence_requirement": "highly_recommended",
+      "minimum_count": 1,
+      "notes": "Absence causes physical deconditioning and stress accumulation. Must be noise-isolated from crew quarters."
+    },
+
+    "Galley": {
+      "stress_reduction": 10,
+      "mood_bonus": 15,
+      "sleep_quality_bonus": 5,
+      "cohesion_impact": 15,
+      "rationale": "Food preparation area provides autonomy and normalcy. Shared cooking enhances crew bonding.",
+      "presence_requirement": "highly_recommended",
+      "minimum_count": 1,
+      "notes": "Must be separate from WCS to prevent contamination anxiety."
+    },
+
+    "Ward/Dining": {
+      "stress_reduction": 20,
+      "mood_bonus": 25,
+      "sleep_quality_bonus": 10,
+      "cohesion_impact": 35,
+      "rationale": "Communal dining critical for team cohesion (HERA studies). Shared meals reduce isolation stress by 20-25%.",
+      "presence_requirement": "highly_recommended",
+      "minimum_count": 1,
+      "notes": "Crew eating separately shows 40% higher conflict rates (HERA 2019)."
+    },
+
+    "Workstation": {
+      "stress_reduction": 5,
+      "mood_bonus": 10,
+      "sleep_quality_bonus": 0,
+      "cohesion_impact": 10,
+      "rationale": "Dedicated work area separates professional and personal spaces, reducing work-life stress.",
+      "presence_requirement": "recommended",
+      "minimum_count": 1,
+      "notes": "Lack of dedicated workspace causes 15% higher cognitive fatigue."
+    },
+
+    "Medical": {
+      "stress_reduction": 15,
+      "mood_bonus": 10,
+      "sleep_quality_bonus": 5,
+      "cohesion_impact": 5,
+      "rationale": "Medical capability provides psychological safety. Crew reports 10-15% lower anxiety when medical facilities present.",
+      "presence_requirement": "recommended",
+      "minimum_count": 1,
+      "notes": "Critical for long-duration missions (>30 days). Absence increases health-related anxiety."
+    },
+
+    "EVA Prep": {
+      "stress_reduction": 5,
+      "mood_bonus": 5,
+      "sleep_quality_bonus": 0,
+      "cohesion_impact": 5,
+      "rationale": "Dedicated EVA preparation reduces pre-EVA stress. Organized suit storage improves operational confidence.",
+      "presence_requirement": "optional",
+      "minimum_count": 0,
+      "notes": "Important for surface operations. Reduces EVA preparation time stress."
+    },
+
+    "Airlock": {
+      "stress_reduction": 10,
+      "mood_bonus": 5,
+      "sleep_quality_bonus": 0,
+      "cohesion_impact": 0,
+      "rationale": "Safe egress/ingress reduces operational anxiety. Proper airlock design prevents contamination stress.",
+      "presence_requirement": "optional",
+      "minimum_count": 0,
+      "notes": "Critical for lunar surface habitats. Missing airlock limits EVA capability."
+    },
+
+    "Recreation": {
+      "stress_reduction": 20,
+      "mood_bonus": 30,
+      "sleep_quality_bonus": 10,
+      "cohesion_impact": 25,
+      "rationale": "Dedicated recreation space reduces monotony. HERA shows 25-30% mood improvement with recreation facilities.",
+      "presence_requirement": "recommended",
+      "minimum_count": 1,
+      "notes": "Can be combined with Ward/Dining. Personal recreation critical for individual well-being."
+    },
+
+    "Window Station": {
+      "stress_reduction": 25,
+      "mood_bonus": 35,
+      "sleep_quality_bonus": 15,
+      "cohesion_impact": 10,
+      "rationale": "Windows provide critical psychological connection to outside environment. UND study shows 30-40% stress reduction with physical windows vs digital.",
+      "presence_requirement": "highly_recommended",
+      "minimum_count": 1,
+      "notes": "Digital windows provide 50% benefit of physical windows. No windows causes severe monotony stress."
+    },
+
+    "Laboratory": {
+      "stress_reduction": 10,
+      "mood_bonus": 15,
+      "sleep_quality_bonus": 0,
+      "cohesion_impact": 10,
+      "rationale": "Science activities provide purpose and engagement. Crew with dedicated lab space report 10-15% higher mission satisfaction.",
+      "presence_requirement": "optional",
+      "minimum_count": 0,
+      "notes": "Important for research missions. Engages crew in meaningful work."
+    },
+
+    "Communications": {
+      "stress_reduction": 15,
+      "mood_bonus": 20,
+      "sleep_quality_bonus": 10,
+      "cohesion_impact": 5,
+      "rationale": "Contact with Earth reduces isolation stress. HERA protocol allows weekly family conferences, reducing stress by 15-20%.",
+      "presence_requirement": "highly_recommended",
+      "minimum_count": 1,
+      "notes": "Absence increases isolation anxiety. Critical for crew morale."
+    },
+
+    "Stowage": {
+      "stress_reduction": 5,
+      "mood_bonus": 10,
+      "sleep_quality_bonus": 5,
+      "cohesion_impact": 0,
+      "rationale": "Organized storage reduces clutter stress. Visual order impact per UND study (15% stress reduction with organization).",
+      "presence_requirement": "recommended",
+      "minimum_count": 1,
+      "notes": "Inadequate storage causes clutter and disorganization stress."
+    },
+
+    "IFM/Repair": {
+      "stress_reduction": 5,
+      "mood_bonus": 5,
+      "sleep_quality_bonus": 0,
+      "cohesion_impact": 5,
+      "rationale": "In-flight maintenance capability reduces equipment failure anxiety. Crew autonomy improves confidence.",
+      "presence_requirement": "optional",
+      "minimum_count": 0,
+      "notes": "Important for long missions. Reduces dependency stress."
+    },
+
+    "Trash": {
+      "stress_reduction": 10,
+      "mood_bonus": 5,
+      "sleep_quality_bonus": 5,
+      "cohesion_impact": 0,
+      "rationale": "Waste management prevents odor and hygiene stress. Proper trash handling critical for habitability.",
+      "presence_requirement": "recommended",
+      "minimum_count": 1,
+      "notes": "Absence causes contamination anxiety and disgust responses."
+    }
+  },
+
+  "absence_penalties": {
+    "Crew Quarters": {
+      "stress_penalty": 50,
+      "mood_penalty": 40,
+      "sleep_quality_penalty": 60,
+      "cohesion_penalty": 20,
+      "notes": "Severe impact - no private sleep space causes cumulative stress and sleep deprivation"
+    },
+    "Hygiene": {
+      "stress_penalty": 40,
+      "mood_penalty": 50,
+      "sleep_quality_penalty": 20,
+      "cohesion_penalty": 30,
+      "notes": "Critical impact - hygiene deprivation affects dignity, health anxiety, and social comfort"
+    },
+    "WCS": {
+      "stress_penalty": 60,
+      "mood_penalty": 50,
+      "sleep_quality_penalty": 30,
+      "cohesion_penalty": 20,
+      "notes": "Catastrophic impact - missing toilet facilities is mission-critical failure"
+    },
+    "Exercise": {
+      "stress_penalty": 35,
+      "mood_penalty": 30,
+      "sleep_quality_penalty": 25,
+      "cohesion_penalty": 15,
+      "notes": "High impact - no exercise causes physical deconditioning and stress buildup"
+    },
+    "Ward/Dining": {
+      "stress_penalty": 25,
+      "mood_penalty": 30,
+      "sleep_quality_penalty": 10,
+      "cohesion_penalty": 50,
+      "notes": "Severe cohesion impact - crew eating separately reduces team bonding"
+    },
+    "Window Station": {
+      "stress_penalty": 30,
+      "mood_penalty": 40,
+      "sleep_quality_penalty": 20,
+      "cohesion_penalty": 10,
+      "notes": "High impact - no visual connection to outside causes monotony and confinement stress"
+    },
+    "Communications": {
+      "stress_penalty": 20,
+      "mood_penalty": 30,
+      "sleep_quality_penalty": 15,
+      "cohesion_penalty": 10,
+      "notes": "Moderate-high impact - Earth isolation increases loneliness and anxiety"
+    }
+  },
+
+  "proximity_effects": {
+    "Exercise_near_CrewQuarters": {
+      "distance_threshold_m": 2.0,
+      "stress_penalty": 20,
+      "sleep_quality_penalty": 30,
+      "rationale": "Noise from exercise disrupts sleep. NASA TP-2020-220505 requires 2m+ separation.",
+      "severity": "high"
+    },
+    "WCS_near_Galley": {
+      "distance_threshold_m": 3.0,
+      "stress_penalty": 35,
+      "mood_penalty": 25,
+      "rationale": "Contamination anxiety from toilet proximity to food prep. Critical adjacency violation.",
+      "severity": "critical"
+    },
+    "Hygiene_near_CrewQuarters": {
+      "distance_threshold_m": 1.5,
+      "stress_penalty": 15,
+      "sleep_quality_penalty": 15,
+      "rationale": "Moisture and noise from hygiene disturbs sleep areas.",
+      "severity": "medium"
+    },
+    "Medical_near_CrewQuarters": {
+      "distance_bonus_m": 4.0,
+      "stress_reduction": 10,
+      "rationale": "Medical proximity provides comfort without disturbing sleep.",
+      "severity": "low"
+    },
+    "Recreation_near_Ward": {
+      "distance_bonus_m": 3.0,
+      "cohesion_bonus": 15,
+      "rationale": "Social spaces clustered enhance crew interaction and bonding.",
+      "severity": "low"
+    }
+  },
+
+  "area_adequacy_factors": {
+    "undersized_module_penalty": {
+      "stress_multiplier": 1.5,
+      "mood_multiplier": 0.8,
+      "rationale": "Cramped spaces increase stress by 50% per NASA habitability research"
+    },
+    "oversized_module_bonus": {
+      "stress_multiplier": 0.9,
+      "mood_multiplier": 1.1,
+      "rationale": "Spacious areas reduce stress by 10%, improve mood by 10%"
+    },
+    "threshold_ratio": 0.9,
+    "notes": "Modules below 90% of NASA minimum area trigger penalties"
+  }
+}

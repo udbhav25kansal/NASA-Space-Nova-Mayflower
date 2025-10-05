@@ -244,11 +244,11 @@ class HabitatHarmonyApp {
     // Initialize HUD
     this.hud = new HUD(this.validator);
 
-    // Initialize Habitat Configurator (Gap #1: Habitat customization)
-    this.habitatConfigurator = new HabitatConfigurator((config) => {
-      this.updateHabitatConfiguration(config);
-    });
-    this.habitatConfigurator.render();
+    // Habitat Configurator temporarily disabled
+    // this.habitatConfigurator = new HabitatConfigurator((config) => {
+    //   this.updateHabitatConfiguration(config);
+    // });
+    // this.habitatConfigurator.render();
 
     // Initialize Catalog
     this.catalog = new Catalog(ModuleCatalog, (catalogItem) => {
@@ -256,12 +256,7 @@ class HabitatHarmonyApp {
     });
     this.catalog.render();
 
-    // Initialize Object Catalog (Gap #3: Object placement)
-    this.objectCatalog = new ObjectCatalog((objectDef) => {
-      this.addObject(objectDef);
-    });
-
-    // Initialize Path Measurement (Gap #4: Path measurement)
+    // Initialize Path Measurement
     this.pathMeasurement = new PathMeasurement(
       this.sceneManager,
       this.sceneManager.getCamera(),
@@ -269,11 +264,9 @@ class HabitatHarmonyApp {
       this.validator
     );
 
-    // Initialize Scenario Loader (Gap #5: Mission scenarios)
-    this.scenarioLoader = new ScenarioLoader((scenario) => {
-      this.loadMissionScenario(scenario);
-    });
-    this.scenarioLoader.render();
+    // Advanced features temporarily disabled for stability
+    // this.objectCatalog = new ObjectCatalog((objectDef) => { this.addObject(objectDef); });
+    // this.scenarioLoader = new ScenarioLoader(...);
 
     // Setup tile visualization toggle button
     this.setupTileVisualizationToggle();
@@ -1014,6 +1007,16 @@ class HabitatHarmonyApp {
       }
       const psychModelParams = await response.json();
 
+      // Load module psychological impacts
+      const impactsResponse = await fetch('/src/data/module-psychological-impacts.json');
+      if (impactsResponse.ok) {
+        this.moduleImpacts = await impactsResponse.json();
+        console.log('✅ Module psychological impacts loaded');
+      } else {
+        console.warn('⚠️ Could not load module impacts, using defaults');
+        this.moduleImpacts = null;
+      }
+
       // Initialize EXISTING PsychModel with HERA+UND parameters
       this.psychModel = new PsychModel(psychModelParams);
       this.missionParams = new MissionParams();
@@ -1276,7 +1279,7 @@ class HabitatHarmonyApp {
         Toast.show(`⚠️ Recreation space insufficient`, 3000);
       }
 
-      // Create Mission Simulator with Mars-Sim features
+      // Create Mission Simulator with Mars-Sim features + Module Impacts
       this.missionSimulator = new MissionSimulator(
         layout,
         {
@@ -1287,7 +1290,8 @@ class HabitatHarmonyApp {
           genders: this.crew.map(c => c.gender)
         },
         this.constraints,
-        this.psychModel.params
+        this.psychModel.params,
+        this.moduleImpacts  // Pass module impacts
       );
 
       // Run simulation

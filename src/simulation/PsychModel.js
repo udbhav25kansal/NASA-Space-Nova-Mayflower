@@ -68,7 +68,7 @@ export class PsychModel {
 
   /**
    * Simulate psychological metrics for a single day
-   * @param {Object} designVariables - Layout design variables (P, W, V, L, A, R, E, C)
+   * @param {Object} designVariables - Layout design variables (P, W, V, L, A, R, E, C) + module modifiers
    * @param {Number} currentDay - Current mission day (1-45)
    * @param {Object} previousMetrics - Metrics from previous day (for damping)
    * @returns {Object} - { stress, mood, sleepQuality, cohesion }
@@ -84,6 +84,12 @@ export class PsychModel {
       const R = designVariables.recreationArea || 0;
       const E = designVariables.exerciseCompliance || 0;
 
+      // Extract module-specific modifiers (NEW)
+      const modStress = designVariables.moduleStressModifier || 0;
+      const modMood = designVariables.moduleMoodModifier || 0;
+      const modSleep = designVariables.moduleSleepModifier || 0;
+      const modCohesion = designVariables.moduleCohesionModifier || 0;
+
       // Normalized time (τ ∈ [0,1])
       const tau = (currentDay - 1) / this.missionDays;
 
@@ -93,7 +99,7 @@ export class PsychModel {
       const sleepBase = this.q0 - this.q1 * tau;
       const cohesionBase = this.c0 - this.c1 * tau;
 
-      // Calculate design modifiers
+      // Calculate design modifiers (original formula)
       const deltaStress = -(this.alphaP * P + this.alphaW * W + this.alphaV * V +
                            this.alphaL * L + this.alphaA * A);
       const deltaMood = this.betaP * P + this.betaW * W + this.betaV * V +
@@ -102,24 +108,31 @@ export class PsychModel {
                          this.gammaE * E;
       const deltaCohesion = this.deltaR * R + this.deltaV * V + this.deltaA * A;
 
+      // Apply module-specific impacts (NEW: NASA module research)
+      // Module modifiers are already normalized to -1 to +1, scale to match design variable range
+      const moduleStressImpact = modStress * 30; // Scale to ~30 point impact
+      const moduleMoodImpact = modMood * 30;
+      const moduleSleepImpact = modSleep * 25;
+      const moduleCohesionImpact = modCohesion * 20;
+
       // Apply damping with previous day's values
       let stress, mood, sleepQuality, cohesion;
 
       if (previousMetrics) {
         stress = this.lambdaS * previousMetrics.stress +
-                 (1 - this.lambdaS) * (stressBase + deltaStress);
+                 (1 - this.lambdaS) * (stressBase + deltaStress + moduleStressImpact);
         mood = this.lambdaM * previousMetrics.mood +
-               (1 - this.lambdaM) * (moodBase + deltaMood);
+               (1 - this.lambdaM) * (moodBase + deltaMood + moduleMoodImpact);
         sleepQuality = this.lambdaQ * previousMetrics.sleepQuality +
-                       (1 - this.lambdaQ) * (sleepBase + deltaSleep);
+                       (1 - this.lambdaQ) * (sleepBase + deltaSleep + moduleSleepImpact);
         cohesion = this.lambdaC * previousMetrics.cohesion +
-                   (1 - this.lambdaC) * (cohesionBase + deltaCohesion);
+                   (1 - this.lambdaC) * (cohesionBase + deltaCohesion + moduleCohesionImpact);
       } else {
         // First day - no previous metrics
-        stress = stressBase + deltaStress;
-        mood = moodBase + deltaMood;
-        sleepQuality = sleepBase + deltaSleep;
-        cohesion = cohesionBase + deltaCohesion;
+        stress = stressBase + deltaStress + moduleStressImpact;
+        mood = moodBase + deltaMood + moduleMoodImpact;
+        sleepQuality = sleepBase + deltaSleep + moduleSleepImpact;
+        cohesion = cohesionBase + deltaCohesion + moduleCohesionImpact;
       }
 
       // Clip to [0, 100] range
