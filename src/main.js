@@ -1295,8 +1295,10 @@ class HabitatHarmonyApp {
       );
 
       // Run simulation
+      console.log('🚀 Starting 45-day mission simulation...');
       const results = this.missionSimulator.run();
       this.fullMissionResults = results.dailyMetrics;
+      console.log(`✅ Simulation complete! Processed ${results.dailyMetrics.length} days`);
 
       // Update UI to show final day results
       const currentDayEl = document.getElementById('currentDay');
@@ -1312,10 +1314,17 @@ class HabitatHarmonyApp {
 
       // Calculate PHI
       const phi = this.psychModel.calculatePHI(this.currentDayMetrics);
+      console.log(`📊 Final PHI: ${phi.toFixed(1)}/100`);
+      console.log('  - Stress:', this.currentDayMetrics.stress.toFixed(1));
+      console.log('  - Mood:', this.currentDayMetrics.mood.toFixed(1));
+      console.log('  - Sleep Quality:', this.currentDayMetrics.sleepQuality.toFixed(1));
+      console.log('  - Cohesion:', this.currentDayMetrics.cohesion.toFixed(1));
 
+      // Update display AFTER calculations
       this.updateMetricsDisplay(this.currentDayMetrics, phi);
 
-      Toast.show(`✅ Simulation complete! Final PHI: ${phi.toFixed(1)}`, 3000);
+      // Show completion toast
+      Toast.show(`✅ Simulation complete! Final PHI: ${phi.toFixed(1)}/100`, 4000);
 
       // Show recommendations
       if (results.recommendations.length > 0) {
@@ -1366,20 +1375,28 @@ class HabitatHarmonyApp {
    */
   exportMetricsCSV() {
     try {
+      console.log('📊 Starting CSV export...');
+
       // Check if simulation has been run
       if (!this.fullMissionResults || this.fullMissionResults.length === 0) {
-        Toast.show('Please run simulation first!', 3000);
+        Toast.show('⚠️ Please run simulation first!', 3000);
+        console.warn('Export failed: No simulation results available');
         return;
       }
+
+      console.log(`  - Mission results: ${this.fullMissionResults.length} days`);
+      console.log(`  - Modules to export: ${this.modules.length}`);
 
       // Get layout for validation
       const layout = this.getLayoutForValidation();
 
       // Compute design variables
+      console.log('  - Computing design variables...');
       const designVars = this.missionParams.computeDesignVariables(
         this.modules,
         this.validator
       );
+      console.log('  - Design variables computed:', designVars);
 
       // Get constraint report
       const hudReport = this.hud.getLastReport();
@@ -1389,10 +1406,12 @@ class HabitatHarmonyApp {
       };
 
       // Get full simulation report
+      console.log('  - Generating simulation report...');
       const simulationReport = this.missionSimulator ?
         this.missionSimulator.generateReport() : null;
 
       // Generate CSV (Mars-Sim Enhanced)
+      console.log('  - Generating CSV content...');
       const csv = CSVGenerator.generateCSV(
         this.modules,
         designVars,
@@ -1406,14 +1425,17 @@ class HabitatHarmonyApp {
         const filename = `habitat-harmony-mars-sim-${timestamp}.csv`;
         CSVGenerator.downloadCSV(csv, filename);
 
+        console.log(`✅ CSV exported successfully: ${filename}`);
         Toast.show(`📊 Exported to ${filename}`, 3000);
       } else {
-        Toast.show('CSV export failed', 3000);
+        console.error('❌ CSV generation returned null/empty');
+        Toast.show('❌ CSV export failed - empty result', 3000);
       }
 
     } catch (error) {
-      console.error('Error exporting CSV:', error);
-      Toast.show('CSV export failed', 3000);
+      console.error('❌ Error exporting CSV:', error);
+      console.error('Stack trace:', error.stack);
+      Toast.show(`❌ CSV export failed: ${error.message}`, 4000);
     }
   }
 }
