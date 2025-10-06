@@ -49,13 +49,33 @@ export default class HabitatConfigurator {
     this.selectedType = this.habitatTypes[0];
     this.isLoaded = true;
 
+    // Launch vehicle definitions
+    this.launchVehicles = {
+      sls_block_1: {
+        name: 'SLS Block 1',
+        payload_fairing: { diameter_m: 8.4 },
+        max_payload_mass_kg: 27000
+      },
+      falcon_heavy: {
+        name: 'Falcon Heavy',
+        payload_fairing: { diameter_m: 5.2 },
+        max_payload_mass_kg: 8000
+      },
+      starship_hls: {
+        name: 'Starship HLS',
+        payload_fairing: { diameter_m: 9.0 },
+        max_payload_mass_kg: 100000
+      }
+    };
+
     // Default config
     this.currentConfig = {
       type: 'rectangular_base',
       width: 12.0,
       depth: 8.0,
       height: 3.0,
-      levels: 1
+      levels: 1,
+      launchVehicle: 'sls_block_1'
     };
 
     console.log('✅ HabitatConfigurator initialized with', this.habitatTypes.length, 'habitat types');
@@ -389,18 +409,23 @@ export default class HabitatConfigurator {
     const volumePerCrew = crewCapacity > 0 ? habitableVolume / crewCapacity : 0;
 
     // Update display
-    document.getElementById('metric-volume').textContent = volume.toFixed(1) + ' m³';
-    document.getElementById('metric-per-crew').textContent = volumePerCrew.toFixed(1) + ' m³';
-    document.getElementById('metric-mass').textContent = Math.round(estimatedMass).toLocaleString() + ' kg';
-    document.getElementById('metric-crew').textContent = crewCapacity;
+    const volumeEl = document.getElementById('metric-volume');
+    const perCrewEl = document.getElementById('metric-per-crew');
+    const massEl = document.getElementById('metric-mass');
+    const crewEl = document.getElementById('metric-crew');
+
+    if (volumeEl) volumeEl.textContent = volume.toFixed(1) + ' m³';
+    if (perCrewEl) perCrewEl.textContent = volumePerCrew.toFixed(1) + ' m³';
+    if (massEl) massEl.textContent = Math.round(estimatedMass).toLocaleString() + ' kg';
+    if (crewEl) crewEl.textContent = crewCapacity;
 
     // Compliance check
     const complianceEl = document.getElementById('compliance-indicator');
     if (complianceEl) {
       // Check launch vehicle fit
-      const vehicle = this.launchVehicles[launchVehicle];
-      const fitsInFairing = width <= vehicle.payload_fairing.diameter_m;
-      const fitsInMass = estimatedMass <= vehicle.max_payload_mass_kg;
+      const vehicle = this.launchVehicles[launchVehicle || 'sls_block_1'];
+      const fitsInFairing = vehicle && width <= vehicle.payload_fairing.diameter_m;
+      const fitsInMass = vehicle && estimatedMass <= vehicle.max_payload_mass_kg;
 
       // Check NASA volume requirements
       const meetsMinVolume = volumePerCrew >= 25;
@@ -420,7 +445,7 @@ export default class HabitatConfigurator {
         complianceHTML = '⚠️ Minimum - Meets NASA minimums only';
         complianceColor = '#d97706';
       } else if (!fitsInFairing || !fitsInMass) {
-        complianceHTML = `❌ Launch constraint violation (${vehicle.name})`;
+        complianceHTML = `❌ Launch constraint violation (${vehicle ? vehicle.name : 'Unknown'})`;
         complianceColor = '#dc2626';
       } else {
         complianceHTML = '❌ Below NASA minimum volume';
